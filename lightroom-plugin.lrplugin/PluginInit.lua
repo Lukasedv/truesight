@@ -17,7 +17,7 @@ local function initPlugin()
     
     -- Check Lightroom version compatibility
     local app = LrApplication
-    local version = app.versionString or "Unknown"
+    local version = app.versionString() or "Unknown"
     pluginLogger:info("Lightroom version: " .. version)
     
     -- Extract and check version compatibility
