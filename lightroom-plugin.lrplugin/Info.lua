@@ -22,11 +22,11 @@ return {
         },
         {
             title = 'Missing Opsin Configuration',
-            file = 'ConfigDialog.lua',
+            file = 'HelpConfiguration.lua',
         },
         {
             title = 'Missing Opsin Troubleshooting',
-            file = 'TroubleShoot.lua',
+            file = 'HelpTroubleshooting.lua',
         },
     },
     
