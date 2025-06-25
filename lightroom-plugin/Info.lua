@@ -4,7 +4,7 @@ A plugin to help photographers with color deficiency analyze and correct photos 
 ]]
 
 return {
-    LrSdkVersion = 6.0,
+    LrSdkVersion = 10.0,
     LrSdkMinimumVersion = 6.0,
     
     LrToolkitIdentifier = 'com.truesight.colordeficiency',

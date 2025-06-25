@@ -7,6 +7,7 @@ local LrView = import 'LrView'
 local LrFunctionContext = import 'LrFunctionContext'
 local LrBinding = import 'LrBinding'
 local LrDialogs = import 'LrDialogs'
+local LrApplication = import 'LrApplication'
 
 local ColorAnalysis = require 'ColorAnalysis'
 
