@@ -17,7 +17,7 @@ fi
 # Validate plugin structure
 echo "📁 Validating plugin structure..."
 
-PLUGIN_DIR="lightroom-plugin"
+PLUGIN_DIR="lightroom-plugin.lrplugin"
 REQUIRED_FILES=(
     "Info.lua"
     "ColorAnalysis.lua"

@@ -68,13 +68,13 @@ We welcome feature suggestions! Please:
 
 4. **Install plugin in Lightroom**
    - File > Plug-in Manager
-   - Add > Select `lightroom-plugin` folder
+   - Add > Select `lightroom-plugin.lrplugin` folder
 
 ### Testing Your Changes
 
 1. **Syntax validation**
    ```bash
-   find lightroom-plugin -name "*.lua" -exec lua5.3 -l {} \;
+   find lightroom-plugin.lrplugin -name "*.lua" -exec lua5.3 -l {} \;
    ```
 
 2. **ARM template validation**
@@ -127,7 +127,7 @@ local AzureOpenAI = {
 ### File Organization
 
 ```
-lightroom-plugin/
+lightroom-plugin.lrplugin/
 ├── Info.lua                 # Plugin manifest - minimal changes only
 ├── ColorAnalysis.lua        # Main analysis logic
 ├── AzureOpenAI.lua         # API integration
@@ -394,7 +394,7 @@ We use Semantic Versioning (SemVer):
 
 - [README.md](../README.md) - Project overview
 - [DEPLOYMENT.md](DEPLOYMENT.md) - Deployment guide
-- [Plugin Help](../lightroom-plugin/help.html) - User documentation
+- [Plugin Help](../lightroom-plugin.lrplugin/help.html) - User documentation
 
 ### Community
 

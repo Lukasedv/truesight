@@ -28,18 +28,18 @@ jobs:
         sudo apt-get install -y lua5.3
         
         # Check Lua syntax for all .lua files
-        find lightroom-plugin -name "*.lua" -exec lua5.3 -l {} \; || exit 1
+        find lightroom-plugin.lrplugin -name "*.lua" -exec lua5.3 -l {} \; || exit 1
         echo "All Lua files have valid syntax"
         
     - name: Validate plugin structure
       run: |
         # Check required files exist
-        if [ ! -f "lightroom-plugin/Info.lua" ]; then
+        if [ ! -f "lightroom-plugin.lrplugin/Info.lua" ]; then
           echo "Error: Info.lua not found"
           exit 1
         fi
         
-        if [ ! -f "lightroom-plugin/help.html" ]; then
+        if [ ! -f "lightroom-plugin.lrplugin/help.html" ]; then
           echo "Error: help.html not found"
           exit 1
         fi
@@ -73,7 +73,7 @@ jobs:
         mkdir -p dist
         
         # Copy plugin files
-        cp -r lightroom-plugin dist/TrueSight.lrplugin
+        cp -r lightroom-plugin.lrplugin dist/TrueSight.lrplugin
         
         # Create version info
         echo "Version: ${{ env.PLUGIN_VERSION }}" > dist/TrueSight.lrplugin/VERSION.txt
@@ -151,13 +151,13 @@ jobs:
     - name: Run security scan
       run: |
         # Check for hardcoded secrets
-        if grep -r "sk-" lightroom-plugin/ || grep -r "Bearer " lightroom-plugin/; then
+        if grep -r "sk-" lightroom-plugin.lrplugin/ || grep -r "Bearer " lightroom-plugin.lrplugin/; then
           echo "Warning: Potential hardcoded API keys found"
           exit 1
         fi
         
         # Check for sensitive patterns
-        if grep -ri "password\|secret\|key" lightroom-plugin/ --include="*.lua" | grep -v "api_key" | grep -v "apiKey" | grep -v "getConfig"; then
+        if grep -ri "password\|secret\|key" lightroom-plugin.lrplugin/ --include="*.lua" | grep -v "api_key" | grep -v "apiKey" | grep -v "getConfig"; then
           echo "Warning: Potential sensitive information found"
         fi
         
@@ -179,7 +179,7 @@ jobs:
         mkdir -p docs
         
         # Copy help file to docs
-        cp lightroom-plugin/help.html docs/
+        cp lightroom-plugin.lrplugin/help.html docs/
         
         # Generate API documentation (placeholder)
         echo "# TrueSight API Documentation" > docs/api.md
