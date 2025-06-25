@@ -24,7 +24,10 @@ end
 local ConfigDialog = {}
 
 function ConfigDialog.showConfigDialog()
-    -- Wrap the entire function in error handling to ensure dialog always shows
+    -- Show immediate feedback that the function was called
+    LrDialogs.message('Missing Opsin Configuration', 'Loading configuration dialog...', 'info')
+    
+    -- Ensure a dialog always shows, even if there are errors
     local success, error = pcall(function()
         LrFunctionContext.callWithContext('configDialog', function(context)
             local f = LrView.osFactory()
@@ -149,9 +152,9 @@ function ConfigDialog.showConfigDialog()
             actionVerb = 'Save',
         })
         
-            if result == 'ok' then
-                ConfigDialog.saveConfiguration(props)
-            end
+        if result == 'ok' then
+            ConfigDialog.saveConfiguration(props)
+        end
         end)
     end)
     

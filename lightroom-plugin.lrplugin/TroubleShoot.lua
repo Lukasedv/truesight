@@ -13,6 +13,9 @@ local LrPathUtils = import 'LrPathUtils'
 local TroubleShoot = {}
 
 function TroubleShoot.showTroubleshootingDialog()
+    -- Show immediate feedback that the function was called
+    LrDialogs.message('Missing Opsin Troubleshooting', 'Running diagnostics...', 'info')
+    
     -- Wrap in error handling to ensure dialog always shows
     local success, error = pcall(function()
         local diagnostics = TroubleShoot.runDiagnostics()
