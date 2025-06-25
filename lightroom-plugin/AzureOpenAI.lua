@@ -10,6 +10,7 @@ local LrPathUtils = import 'LrPathUtils'
 local LrFileUtils = import 'LrFileUtils'
 local LrStringUtils = import 'LrStringUtils'
 local LrBase64 = import 'LrBase64'
+local LrTasks = import 'LrTasks'
 
 local AzureOpenAI = {}
 
