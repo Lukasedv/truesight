@@ -1,15 +1,15 @@
 #!/bin/bash
 
-# TrueSight Azure Infrastructure Deployment Script
-# This script deploys the required Azure OpenAI resources for the TrueSight plugin
+# Missing Opsin Azure Infrastructure Deployment Script
+# This script deploys the required Azure OpenAI resources for the Missing Opsin plugin
 
 set -e
 
 # Configuration
-RESOURCE_GROUP_NAME="truesight-rg"
+RESOURCE_GROUP_NAME="missing-opsin-rg"
 LOCATION="eastus"
 TEMPLATE_FILE="deploy-openai.json"
-DEPLOYMENT_NAME="truesight-deployment-$(date +%Y%m%d-%H%M%S)"
+DEPLOYMENT_NAME="missing-opsin-deployment-$(date +%Y%m%d-%H%M%S)"
 
 # Colors for output
 RED='\033[0;31m'
@@ -43,7 +43,7 @@ if ! az account show &> /dev/null; then
     exit 1
 fi
 
-log_info "Starting TrueSight infrastructure deployment..."
+log_info "Starting Missing Opsin infrastructure deployment..."
 
 # Create resource group if it doesn't exist
 log_info "Creating resource group: $RESOURCE_GROUP_NAME"
@@ -78,20 +78,20 @@ if [ $? -eq 0 ]; then
     
     # Display configuration information
     echo ""
-    log_info "=== TrueSight Configuration ==="
+    log_info "=== Missing Opsin Configuration ==="
     echo "Resource Group: $RESOURCE_GROUP_NAME"
     echo "OpenAI Service Name: $OPENAI_SERVICE_NAME"
     echo "Endpoint: $OPENAI_ENDPOINT"
     echo "Deployment Name: $DEPLOYMENT_NAME_OUTPUT"
     echo "API Key: $API_KEY"
     echo ""
-    log_info "Use these values to configure the TrueSight Lightroom plugin."
+    log_info "Use these values to configure the Missing Opsin Lightroom plugin."
     echo ""
     log_warn "Keep your API key secure and do not share it publicly!"
     
     # Save configuration to file
-    cat > truesight-config.txt << EOF
-TrueSight Configuration
+    cat > missing-opsin-config.txt << EOF
+Missing Opsin Configuration
 =======================
 Resource Group: $RESOURCE_GROUP_NAME
 OpenAI Service Name: $OPENAI_SERVICE_NAME
@@ -101,17 +101,17 @@ API Key: $API_KEY
 
 Instructions:
 1. Open Lightroom Classic
-2. Go to Help > TrueSight Help
+2. Go to Help > Missing Opsin Help
 3. Click the configuration button
 4. Enter the Endpoint and API Key values above
 5. Set the Deployment Name to: $DEPLOYMENT_NAME_OUTPUT
 EOF
     
-    log_info "Configuration saved to truesight-config.txt"
+    log_info "Configuration saved to missing-opsin-config.txt"
     
 else
     log_error "Deployment failed. Please check the error messages above."
     exit 1
 fi
 
-log_info "TrueSight infrastructure deployment complete!"
+log_info "Missing Opsin infrastructure deployment complete!"

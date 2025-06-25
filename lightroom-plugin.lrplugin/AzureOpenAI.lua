@@ -45,7 +45,7 @@ function AzureOpenAI.analyzeImage(imagePath)
     local config = AzureOpenAI.getConfig()
     
     if not config.endpoint or not config.apiKey then
-        LrDialogs.message('TrueSight Configuration Error', 
+        LrDialogs.message('Missing Opsin Configuration Error', 
             'Please configure Azure OpenAI settings in the plugin preferences.')
         return nil
     end

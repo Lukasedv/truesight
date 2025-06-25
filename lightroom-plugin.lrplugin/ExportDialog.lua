@@ -13,7 +13,7 @@ local LrApplication = import 'LrApplication'
 local function getColorAnalysis()
     local success, module = pcall(require, 'ColorAnalysis')
     if not success then
-        LrDialogs.message('TrueSight Error', 'Color Analysis module failed to load.')
+        LrDialogs.message('Missing Opsin Error', 'Color Analysis module failed to load.')
         return nil
     end
     return module
@@ -37,7 +37,7 @@ function ExportDialog.showDialog()
             
             f:row {
                 f:static_text {
-                    title = 'TrueSight Export with Color Analysis',
+                    title = 'Missing Opsin Export with Color Analysis',
                     font = '<system/bold>',
                 },
             },
@@ -88,7 +88,7 @@ function ExportDialog.showDialog()
         }
         
         local result = LrDialogs.presentModalDialog({
-            title = 'TrueSight Export',
+            title = 'Missing Opsin Export',
             contents = contents,
             actionVerb = 'Export',
         })
@@ -104,7 +104,7 @@ function ExportDialog.processExport(props)
     local selectedPhotos = catalog:getTargetPhotos()
     
     if #selectedPhotos == 0 then
-        LrDialogs.message('TrueSight Export', 'Please select photos to export.')
+        LrDialogs.message('Missing Opsin Export', 'Please select photos to export.')
         return
     end
     
@@ -116,12 +116,12 @@ function ExportDialog.processExport(props)
                 ColorAnalysis.analyzeSinglePhoto(photo)
             end
         else
-            LrDialogs.message('TrueSight Export', 'Color analysis is not available. Proceeding with standard export.')
+            LrDialogs.message('Missing Opsin Export', 'Color analysis is not available. Proceeding with standard export.')
         end
     end
     
     -- Proceed with standard export
-    LrDialogs.message('TrueSight Export', 'Analysis complete. Photos ready for standard export.')
+    LrDialogs.message('Missing Opsin Export', 'Analysis complete. Photos ready for standard export.')
 end
 
 -- Export the module

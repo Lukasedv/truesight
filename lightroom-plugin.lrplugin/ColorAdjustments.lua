@@ -17,7 +17,7 @@ function ColorAdjustments.applyAdjustments(photo, adjustments)
     
     local catalog = LrApplication.activeCatalog()
     
-    catalog:withWriteAccessDo("Apply TrueSight Color Adjustments", function()
+    catalog:withWriteAccessDo("Apply Missing Opsin Color Adjustments", function()
         -- Select the photo first
         catalog:setSelectedPhotos(photo, {photo})
         
@@ -159,7 +159,7 @@ end
 function ColorAdjustments.resetAdjustments(photo)
     local catalog = LrApplication.activeCatalog()
     
-    catalog:withWriteAccessDo("Reset TrueSight Adjustments", function()
+    catalog:withWriteAccessDo("Reset Missing Opsin Adjustments", function()
         photo:resetDevelopmentSettings()
     end)
 end

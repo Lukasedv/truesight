@@ -1,7 +1,7 @@
 # Plugin Loading Fix - Summary
 
 ## Issue Fixed
-The TrueSight plugin was not loading in Adobe Lightroom Classic because the plugin directory did not have the required `.lrplugin` extension.
+The Missing Opsin plugin was not loading in Adobe Lightroom Classic because the plugin directory did not have the required `.lrplugin` extension.
 
 ## What Was Changed
 1. **Directory Rename**: Renamed `lightroom-plugin/` to `lightroom-plugin.lrplugin/`
@@ -29,7 +29,7 @@ The plugin should now load successfully and appear in Lightroom's menus.
 
 ## Troubleshooting
 If the plugin still doesn't load after this fix:
-1. Go to `Help > TrueSight Troubleshooting` in Lightroom (if available)
+1. Go to `Help > Missing Opsin Troubleshooting` in Lightroom (if available)
 2. Check that you're using Lightroom Classic 14.4 or later
 3. Verify all required files are present in the plugin directory
 4. Restart Lightroom after installing the plugin
@@ -39,4 +39,4 @@ If the plugin still doesn't load after this fix:
 - **Required Extension**: `.lrplugin`
 - **Lightroom Version**: 14.4+
 - **SDK Version**: 13.0 (minimum 10.0)
-- **Plugin Identifier**: `com.truesight.colordeficiency`
+- **Plugin Identifier**: `com.missing-opsin.colordeficiency`

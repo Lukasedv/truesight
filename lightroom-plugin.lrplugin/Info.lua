@@ -1,5 +1,5 @@
 --[[
-TrueSight Lightroom Plugin
+Missing Opsin Lightroom Plugin
 A plugin to help photographers with color deficiency analyze and correct photos using Azure OpenAI
 
 Compatible with Lightroom Classic 14.4 and later
@@ -10,36 +10,36 @@ return {
     LrSdkVersion = 13.0,
     LrSdkMinimumVersion = 10.0,
     
-    LrToolkitIdentifier = 'com.truesight.colordeficiency',
-    LrPluginName = 'TrueSight - Color Deficiency Assistant',
+    LrToolkitIdentifier = 'com.missingopsin.colordeficiency',
+    LrPluginName = 'Missing Opsin - Color Deficiency Assistant',
     
-    LrPluginInfoUrl = 'https://github.com/Lukasedv/truesight',
+    LrPluginInfoUrl = 'https://github.com/Lukasedv/missing-opsin',
     
     LrHelpMenuItems = {
         {
-            title = 'TrueSight Help',
+            title = 'Missing Opsin Help',
             file = 'help.html',
         },
         {
-            title = 'TrueSight Configuration',
+            title = 'Missing Opsin Configuration',
             file = 'ConfigDialog.lua',
         },
         {
-            title = 'TrueSight Troubleshooting',
+            title = 'Missing Opsin Troubleshooting',
             file = 'TroubleShoot.lua',
         },
     },
     
     LrExportMenuItems = {
         {
-            title = 'Analyze Colors with TrueSight',
+            title = 'Analyze Colors with Missing Opsin',
             file = 'ExportDialog.lua',
         },
     },
     
     LrLibraryMenuItems = {
         {
-            title = 'TrueSight Color Analysis',
+            title = 'Missing Opsin Color Analysis',
             file = 'ColorAnalysis.lua',
         },
     },

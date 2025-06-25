@@ -16,7 +16,7 @@ local LrProgressScope = import 'LrProgressScope'
 local function getAzureOpenAI()
     local success, module = pcall(require, 'AzureOpenAI')
     if not success then
-        LrDialogs.message('TrueSight Error', 'Azure OpenAI module failed to load. Please check your configuration.')
+        LrDialogs.message('Missing Opsin Error', 'Azure OpenAI module failed to load. Please check your configuration.')
         return nil
     end
     return module
@@ -25,7 +25,7 @@ end
 local function getColorAdjustments()
     local success, module = pcall(require, 'ColorAdjustments')
     if not success then
-        LrDialogs.message('TrueSight Error', 'Color Adjustments module failed to load.')
+        LrDialogs.message('Missing Opsin Error', 'Color Adjustments module failed to load.')
         return nil
     end
     return module
@@ -37,7 +37,7 @@ local ColorAnalysis = {}
 function ColorAnalysis.analyzeSelectedPhotos()
     LrFunctionContext.callWithContext('analyzePhotos', function(context)
         local progressScope = LrProgressScope({
-            title = 'TrueSight Color Analysis',
+            title = 'Missing Opsin Color Analysis',
             functionContext = context,
         })
         
@@ -45,7 +45,7 @@ function ColorAnalysis.analyzeSelectedPhotos()
         local selectedPhotos = catalog:getTargetPhotos()
         
         if #selectedPhotos == 0 then
-            LrDialogs.message('TrueSight', 'Please select one or more photos to analyze.')
+            LrDialogs.message('Missing Opsin', 'Please select one or more photos to analyze.')
             return
         end
         
@@ -88,7 +88,7 @@ function ColorAnalysis.analyzeSinglePhoto(photo, context)
                 -- Show results and suggestions
                 ColorAnalysis.showAnalysisResults(photo, analysis)
             else
-                LrDialogs.message('TrueSight Error', 'Failed to analyze photo. Please check your Azure OpenAI configuration.')
+                LrDialogs.message('Missing Opsin Error', 'Failed to analyze photo. Please check your Azure OpenAI configuration.')
             end
             
             -- Clean up temporary file
@@ -100,7 +100,7 @@ end
 -- Export photo for analysis
 function ColorAnalysis.exportPhotoForAnalysis(photo)
     local tempDir = LrPathUtils.getStandardFilePath('temp')
-    local filename = 'truesight_' .. photo:getFormattedMetadata('fileName') .. '.jpg'
+    local filename = 'missing-opsin_' .. photo:getFormattedMetadata('fileName') .. '.jpg'
     local tempPath = LrPathUtils.child(tempDir, filename)
     
     -- Export photo as JPEG for analysis
@@ -135,7 +135,7 @@ end
 -- Show analysis results to user
 function ColorAnalysis.showAnalysisResults(photo, analysis)
     local result = LrDialogs.presentModalDialog({
-        title = 'TrueSight Color Analysis Results',
+        title = 'Missing Opsin Color Analysis Results',
         contents = ColorAnalysis.createResultsDialog(analysis),
         actionVerb = 'Apply Adjustments',
         cancelVerb = 'Close',

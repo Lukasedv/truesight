@@ -1,4 +1,4 @@
-# TrueSight Plugin Installation Guide for Lightroom 14.4
+# Missing Opsin Plugin Installation Guide for Lightroom 14.4
 
 ## Compatibility Requirements
 
@@ -33,29 +33,29 @@ Download the complete `lightroom-plugin.lrplugin` folder from the repository.
 ### 4. Verify Installation
 
 After installation, you should see:
-- `Help > TrueSight Help`
-- `Help > TrueSight Configuration`
-- `Help > TrueSight Troubleshooting`
-- `Library > TrueSight Color Analysis`
-- `File > Export > Analyze Colors with TrueSight`
+- `Help > Missing Opsin Help`
+- `Help > Missing Opsin Configuration`
+- `Help > Missing Opsin Troubleshooting`
+- `Library > Missing Opsin Color Analysis`
+- `File > Export > Analyze Colors with Missing Opsin`
 
 ## Troubleshooting Installation Issues
 
 ### Plugin Not Appearing in Menus
 
-If TrueSight doesn't appear in Lightroom menus:
+If Missing Opsin doesn't appear in Lightroom menus:
 
 1. **Check Version Compatibility**
    - Verify Lightroom Classic is 14.4 or later
    - Older versions are not supported
 
 2. **Run Built-in Diagnostics**
-   - If the plugin partially loads, go to `Help > TrueSight Troubleshooting`
+   - If the plugin partially loads, go to `Help > Missing Opsin Troubleshooting`
    - This will provide detailed diagnostic information
 
 3. **Check Plugin Manager**
    - Go to `File > Plug-in Manager`
-   - Look for "TrueSight - Color Deficiency Assistant" in the list
+   - Look for "Missing Opsin - Color Deficiency Assistant" in the list
    - If present but disabled, enable it
    - If showing errors, note the error message
 
@@ -94,23 +94,23 @@ Ensure these files are present in your plugin folder:
 ## Next Steps After Installation
 
 1. **Configure Azure OpenAI**
-   - Go to `Help > TrueSight Configuration`
+   - Go to `Help > Missing Opsin Configuration`
    - Enter your Azure OpenAI endpoint and API key
 
 2. **Test the Plugin**
    - Select a photo in Library
-   - Go to `Library > TrueSight Color Analysis`
+   - Go to `Library > Missing Opsin Color Analysis`
    - Check that the interface appears
 
 3. **Run Diagnostics**
-   - Use `Help > TrueSight Troubleshooting` to verify everything is working
+   - Use `Help > Missing Opsin Troubleshooting` to verify everything is working
 
 ## Getting Help
 
 If you're still experiencing issues:
 
 1. Run the built-in troubleshooting tool
-2. Check the [GitHub Issues](https://github.com/Lukasedv/truesight/issues) page  
+2. Check the [GitHub Issues](https://github.com/Lukasedv/missing-opsin/issues) page  
 3. Create a new issue with your diagnostic information
 
 ## Version History

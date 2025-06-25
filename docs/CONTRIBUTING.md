@@ -1,6 +1,6 @@
-# Contributing to TrueSight
+# Contributing to Missing Opsin
 
-Thank you for your interest in contributing to TrueSight! This document provides guidelines and information for contributors.
+Thank you for your interest in contributing to Missing Opsin! This document provides guidelines and information for contributors.
 
 ## 🤝 How to Contribute
 
@@ -50,9 +50,9 @@ We welcome feature suggestions! Please:
 
 1. **Clone your fork**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/truesight.git
-   cd truesight
-   git remote add upstream https://github.com/Lukasedv/truesight.git
+   git clone https://github.com/YOUR_USERNAME/missing-opsin.git
+   cd missing-opsin
+   git remote add upstream https://github.com/Lukasedv/missing-opsin.git
    ```
 
 2. **Create development branch**
@@ -424,4 +424,4 @@ Contributors will be recognized in:
 - Release notes for significant contributions
 - README acknowledgments
 
-Thank you for contributing to TrueSight! Your efforts help make photography more accessible for everyone.
+Thank you for contributing to Missing Opsin! Your efforts help make photography more accessible for everyone.

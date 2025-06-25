@@ -14,7 +14,7 @@ local function getAzureOpenAI(silent)
     local success, module = pcall(require, 'AzureOpenAI')
     if not success then
         if not silent then
-            LrDialogs.message('TrueSight Error', 'Azure OpenAI module failed to load. Please check your installation.')
+            LrDialogs.message('Missing Opsin Error', 'Azure OpenAI module failed to load. Please check your installation.')
         end
         return nil
     end
@@ -48,7 +48,7 @@ function ConfigDialog.showConfigDialog()
             
             f:row {
                 f:static_text {
-                    title = 'TrueSight Configuration',
+                    title = 'Missing Opsin Configuration',
                     font = '<system/bold>',
                 },
             },
@@ -141,7 +141,7 @@ function ConfigDialog.showConfigDialog()
         }
         
         local result = LrDialogs.presentModalDialog({
-            title = 'TrueSight Configuration',
+            title = 'Missing Opsin Configuration',
             contents = contents,
             actionVerb = 'Save',
         })
@@ -173,7 +173,7 @@ function ConfigDialog.saveConfiguration(props)
         prefs.azureDeploymentName = props.azureDeploymentName
     end
     
-    LrDialogs.message('TrueSight', 'Configuration saved successfully.')
+    LrDialogs.message('Missing Opsin', 'Configuration saved successfully.')
 end
 
 function ConfigDialog.testConnection(props)

@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# TrueSight Plugin Validation Script
+# Missing Opsin Plugin Validation Script
 # This script validates the plugin structure and basic Lua syntax
 
 set -e
 
-echo "🔍 TrueSight Plugin Validation"
+echo "🔍 Missing Opsin Plugin Validation"
 echo "================================"
 
 # Check if lua is available

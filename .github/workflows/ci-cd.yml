@@ -1,4 +1,4 @@
-name: TrueSight CI/CD
+name: Missing Opsin CI/CD
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
     types: [published]
 
 env:
-  PLUGIN_NAME: TrueSight
+  PLUGIN_NAME: Missing Opsin
   PLUGIN_VERSION: 1.0.0
 
 jobs:
@@ -73,22 +73,22 @@ jobs:
         mkdir -p dist
         
         # Copy plugin files
-        cp -r lightroom-plugin.lrplugin dist/TrueSight.lrplugin
+        cp -r lightroom-plugin.lrplugin dist/MissingOpsin.lrplugin
         
         # Create version info
-        echo "Version: ${{ env.PLUGIN_VERSION }}" > dist/TrueSight.lrplugin/VERSION.txt
-        echo "Build Date: $(date -u +%Y-%m-%d)" >> dist/TrueSight.lrplugin/VERSION.txt
-        echo "Git SHA: ${{ github.sha }}" >> dist/TrueSight.lrplugin/VERSION.txt
+        echo "Version: ${{ env.PLUGIN_VERSION }}" > dist/MissingOpsin.lrplugin/VERSION.txt
+        echo "Build Date: $(date -u +%Y-%m-%d)" >> dist/MissingOpsin.lrplugin/VERSION.txt
+        echo "Git SHA: ${{ github.sha }}" >> dist/MissingOpsin.lrplugin/VERSION.txt
         
         # Create archive
         cd dist
-        zip -r "TrueSight-v${{ env.PLUGIN_VERSION }}.zip" TrueSight.lrplugin/
+        zip -r "MissingOpsin-v${{ env.PLUGIN_VERSION }}.zip" MissingOpsin.lrplugin/
         
     - name: Upload plugin artifact
       uses: actions/upload-artifact@v4
       with:
-        name: truesight-plugin
-        path: dist/TrueSight-v${{ env.PLUGIN_VERSION }}.zip
+        name: missing-opsin-plugin
+        path: dist/MissingOpsin-v${{ env.PLUGIN_VERSION }}.zip
         
     - name: Upload to release
       if: github.event_name == 'release'
@@ -97,8 +97,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ github.event.release.upload_url }}
-        asset_path: dist/TrueSight-v${{ env.PLUGIN_VERSION }}.zip
-        asset_name: TrueSight-v${{ env.PLUGIN_VERSION }}.zip
+        asset_path: dist/MissingOpsin-v${{ env.PLUGIN_VERSION }}.zip
+        asset_name: MissingOpsin-v${{ env.PLUGIN_VERSION }}.zip
         asset_content_type: application/zip
 
   deploy-infrastructure:
@@ -120,9 +120,9 @@ jobs:
     - name: Deploy Azure OpenAI
       run: |
         # Set variables
-        RESOURCE_GROUP_NAME="truesight-prod-rg"
+        RESOURCE_GROUP_NAME="missing-opsin-prod-rg"
         LOCATION="eastus"
-        DEPLOYMENT_NAME="truesight-$(date +%Y%m%d-%H%M%S)"
+        DEPLOYMENT_NAME="missing-opsin-$(date +%Y%m%d-%H%M%S)"
         
         # Create resource group
         az group create \
@@ -135,7 +135,7 @@ jobs:
           --template-file azure-infrastructure/deploy-openai.json \
           --name "$DEPLOYMENT_NAME" \
           --parameters \
-            openAiServiceName="truesight-openai-prod" \
+            openAiServiceName="missing-opsin-openai-prod" \
             deploymentName="gpt-4o-prod"
             
         echo "Infrastructure deployment completed"
@@ -182,7 +182,7 @@ jobs:
         cp lightroom-plugin.lrplugin/help.html docs/
         
         # Generate API documentation (placeholder)
-        echo "# TrueSight API Documentation" > docs/api.md
+        echo "# Missing Opsin API Documentation" > docs/api.md
         echo "" >> docs/api.md
         echo "Generated on: $(date)" >> docs/api.md
         

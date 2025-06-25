@@ -1,6 +1,6 @@
-# TrueSight - Lightroom Plugin for Color Deficiency Support
+# Missing Opsin - Lightroom Plugin for Color Deficiency Support
 
-TrueSight is a powerful Adobe Lightroom Classic plugin designed to help photographers with color deficiency (color blindness) analyze and correct their photos using AI-powered color analysis through Azure OpenAI's GPT-4 Vision capabilities.
+Missing Opsin is a powerful Adobe Lightroom Classic plugin designed to help photographers with color deficiency (color blindness) analyze and correct their photos using AI-powered color analysis through Azure OpenAI's GPT-4 Vision capabilities.
 
 ## 🎯 Features
 
@@ -29,8 +29,8 @@ TrueSight is a powerful Adobe Lightroom Classic plugin designed to help photogra
 
 1. **Download the Plugin**
    ```bash
-   git clone https://github.com/Lukasedv/truesight.git
-   cd truesight
+   git clone https://github.com/Lukasedv/missing-opsin.git
+   cd missing-opsin
    ```
 
 2. **Install in Lightroom**
@@ -46,7 +46,7 @@ TrueSight is a powerful Adobe Lightroom Classic plugin designed to help photogra
    ```
 
 4. **Configure the Plugin**
-   - In Lightroom, go to `Help > TrueSight Help`
+   - In Lightroom, go to `Help > Missing Opsin Help`
    - Click the configuration button
    - Enter your Azure OpenAI endpoint and API key
 
@@ -55,20 +55,20 @@ TrueSight is a powerful Adobe Lightroom Classic plugin designed to help photogra
 ### Basic Color Analysis
 
 1. Select one or more photos in the Library module
-2. Go to `Library > TrueSight Color Analysis`
+2. Go to `Library > Missing Opsin Color Analysis`
 3. Wait for the AI analysis to complete
 4. Review the suggestions and click `Apply Adjustments` if desired
 
 ### Export with Analysis
 
 1. Select photos to export
-2. Go to `File > Export > Analyze Colors with TrueSight`
+2. Go to `File > Export > Analyze Colors with Missing Opsin`
 3. Choose your analysis and export options
 4. Click `Export`
 
 ### Understanding the Analysis
 
-TrueSight analyzes your photos for:
+Missing Opsin analyzes your photos for:
 
 - **Color Balance**: Temperature and tint corrections
 - **Skin Tones**: Natural skin color reproduction
@@ -82,8 +82,8 @@ TrueSight analyzes your photos for:
 
 1. **Clone the Repository**
    ```bash
-   git clone https://github.com/Lukasedv/truesight.git
-   cd truesight
+   git clone https://github.com/Lukasedv/missing-opsin.git
+   cd missing-opsin
    ```
 
 2. **Install Development Tools**
@@ -125,11 +125,11 @@ lightroom-plugin.lrplugin/
 
 ### Plugin Not Loading
 
-If TrueSight doesn't appear in Lightroom menus:
+If Missing Opsin doesn't appear in Lightroom menus:
 
 1. **Check Compatibility**: Ensure you're using Lightroom Classic 14.4 or later
-2. **Plugin Manager**: Go to `File > Plug-in Manager` to verify TrueSight is listed
-3. **Run Diagnostics**: Use `Help > TrueSight Troubleshooting` for detailed checks
+2. **Plugin Manager**: Go to `File > Plug-in Manager` to verify Missing Opsin is listed
+3. **Run Diagnostics**: Use `Help > Missing Opsin Troubleshooting` for detailed checks
 4. **Restart Lightroom**: Close and reopen Lightroom Classic
 5. **Reinstall Plugin**: Remove and re-add the plugin if necessary
 
@@ -142,7 +142,7 @@ If TrueSight doesn't appear in Lightroom menus:
 
 ### Diagnostic Tools
 
-The plugin includes built-in diagnostics accessible via `Help > TrueSight Troubleshooting`:
+The plugin includes built-in diagnostics accessible via `Help > Missing Opsin Troubleshooting`:
 
 - Plugin installation verification
 - Lightroom compatibility checks
@@ -152,7 +152,7 @@ The plugin includes built-in diagnostics accessible via `Help > TrueSight Troubl
 ### Getting Help
 
 - Use the built-in troubleshooting tool first
-- Check the [GitHub Issues](https://github.com/Lukasedv/truesight/issues) page
+- Check the [GitHub Issues](https://github.com/Lukasedv/missing-opsin/issues) page
 - Review the help documentation within Lightroom
 
 ## 🛠️ Azure Infrastructure
@@ -205,7 +205,7 @@ The project includes automated CI/CD workflows:
 
 1. Configure Azure service principal:
    ```bash
-   az ad sp create-for-rbac --name "truesight-sp" --role "Contributor" --scopes "/subscriptions/{subscription-id}"
+   az ad sp create-for-rbac --name "missing-opsin-sp" --role "Contributor" --scopes "/subscriptions/{subscription-id}"
    ```
 
 2. Add secrets to GitHub repository:
@@ -307,7 +307,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-- GitHub Issues: [Report bugs or request features](https://github.com/Lukasedv/truesight/issues)
+- GitHub Issues: [Report bugs or request features](https://github.com/Lukasedv/missing-opsin/issues)
 - Documentation: [User Guide](lightroom-plugin.lrplugin/help.html)
 - Email: [Support Email] (configure as needed)
 
