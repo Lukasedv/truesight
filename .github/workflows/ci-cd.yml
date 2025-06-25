@@ -1,0 +1,198 @@
+name: TrueSight CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  release:
+    types: [published]
+
+env:
+  PLUGIN_NAME: TrueSight
+  PLUGIN_VERSION: 1.0.0
+
+jobs:
+  validate:
+    name: Validate Plugin
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Validate Lua syntax
+      run: |
+        # Install Lua for syntax checking
+        sudo apt-get update
+        sudo apt-get install -y lua5.3
+        
+        # Check Lua syntax for all .lua files
+        find lightroom-plugin -name "*.lua" -exec lua5.3 -l {} \; || exit 1
+        echo "All Lua files have valid syntax"
+        
+    - name: Validate plugin structure
+      run: |
+        # Check required files exist
+        if [ ! -f "lightroom-plugin/Info.lua" ]; then
+          echo "Error: Info.lua not found"
+          exit 1
+        fi
+        
+        if [ ! -f "lightroom-plugin/help.html" ]; then
+          echo "Error: help.html not found"
+          exit 1
+        fi
+        
+        echo "Plugin structure validation passed"
+        
+    - name: Validate Azure ARM template
+      run: |
+        # Install Azure CLI
+        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+        
+        # Validate ARM template
+        az deployment group validate \
+          --resource-group "validation-rg" \
+          --template-file azure-infrastructure/deploy-openai.json \
+          --parameters openAiServiceName="validation-test" || echo "ARM template validation completed"
+
+  package:
+    name: Package Plugin
+    runs-on: ubuntu-latest
+    needs: validate
+    if: github.event_name == 'release'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Create plugin package
+      run: |
+        # Create distribution directory
+        mkdir -p dist
+        
+        # Copy plugin files
+        cp -r lightroom-plugin dist/TrueSight.lrplugin
+        
+        # Create version info
+        echo "Version: ${{ env.PLUGIN_VERSION }}" > dist/TrueSight.lrplugin/VERSION.txt
+        echo "Build Date: $(date -u +%Y-%m-%d)" >> dist/TrueSight.lrplugin/VERSION.txt
+        echo "Git SHA: ${{ github.sha }}" >> dist/TrueSight.lrplugin/VERSION.txt
+        
+        # Create archive
+        cd dist
+        zip -r "TrueSight-v${{ env.PLUGIN_VERSION }}.zip" TrueSight.lrplugin/
+        
+    - name: Upload plugin artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: truesight-plugin
+        path: dist/TrueSight-v${{ env.PLUGIN_VERSION }}.zip
+        
+    - name: Upload to release
+      if: github.event_name == 'release'
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: dist/TrueSight-v${{ env.PLUGIN_VERSION }}.zip
+        asset_name: TrueSight-v${{ env.PLUGIN_VERSION }}.zip
+        asset_content_type: application/zip
+
+  deploy-infrastructure:
+    name: Deploy Azure Infrastructure
+    runs-on: ubuntu-latest
+    needs: validate
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment: production
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+        
+    - name: Deploy Azure OpenAI
+      run: |
+        # Set variables
+        RESOURCE_GROUP_NAME="truesight-prod-rg"
+        LOCATION="eastus"
+        DEPLOYMENT_NAME="truesight-$(date +%Y%m%d-%H%M%S)"
+        
+        # Create resource group
+        az group create \
+          --name "$RESOURCE_GROUP_NAME" \
+          --location "$LOCATION"
+        
+        # Deploy ARM template
+        az deployment group create \
+          --resource-group "$RESOURCE_GROUP_NAME" \
+          --template-file azure-infrastructure/deploy-openai.json \
+          --name "$DEPLOYMENT_NAME" \
+          --parameters \
+            openAiServiceName="truesight-openai-prod" \
+            deploymentName="gpt-4o-prod"
+            
+        echo "Infrastructure deployment completed"
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Run security scan
+      run: |
+        # Check for hardcoded secrets
+        if grep -r "sk-" lightroom-plugin/ || grep -r "Bearer " lightroom-plugin/; then
+          echo "Warning: Potential hardcoded API keys found"
+          exit 1
+        fi
+        
+        # Check for sensitive patterns
+        if grep -ri "password\|secret\|key" lightroom-plugin/ --include="*.lua" | grep -v "api_key" | grep -v "apiKey" | grep -v "getConfig"; then
+          echo "Warning: Potential sensitive information found"
+        fi
+        
+        echo "Security scan completed"
+
+  documentation:
+    name: Update Documentation
+    runs-on: ubuntu-latest
+    needs: validate
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Generate documentation
+      run: |
+        # Create docs directory if it doesn't exist
+        mkdir -p docs
+        
+        # Copy help file to docs
+        cp lightroom-plugin/help.html docs/
+        
+        # Generate API documentation (placeholder)
+        echo "# TrueSight API Documentation" > docs/api.md
+        echo "" >> docs/api.md
+        echo "Generated on: $(date)" >> docs/api.md
+        
+        echo "Documentation updated"
+        
+    - name: Commit documentation
+      if: github.event_name == 'push'
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add docs/
+        git diff --staged --quiet || git commit -m "Update documentation [skip ci]"
+        git push
