@@ -24,9 +24,6 @@ end
 local ConfigDialog = {}
 
 function ConfigDialog.showConfigDialog()
-    -- Show immediate feedback that the function was called
-    LrDialogs.message('Missing Opsin Configuration', 'Loading configuration dialog...', 'info')
-    
     -- Ensure a dialog always shows, even if there are errors
     local success, error = pcall(function()
         LrFunctionContext.callWithContext('configDialog', function(context)
@@ -160,12 +157,14 @@ function ConfigDialog.showConfigDialog()
     
     -- If there was an error in the main dialog creation, show a fallback error dialog
     if not success then
+        local errorMsg = 'Failed to load configuration dialog: ' .. tostring(error)
         LrDialogs.message('Missing Opsin Configuration Error', 
-            'Failed to load configuration dialog: ' .. tostring(error) .. 
+            errorMsg .. 
             '\n\nThis may indicate a problem with the plugin installation. Please try:' ..
             '\n1. Restarting Lightroom Classic' ..
             '\n2. Reinstalling the plugin' ..
-            '\n3. Checking that all plugin files are present', 'critical')
+            '\n3. Checking that all plugin files are present' ..
+            '\n\nIf the problem persists, please report this error message on GitHub.', 'critical')
     end
 end
 

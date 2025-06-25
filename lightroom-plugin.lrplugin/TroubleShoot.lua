@@ -13,9 +13,6 @@ local LrPathUtils = import 'LrPathUtils'
 local TroubleShoot = {}
 
 function TroubleShoot.showTroubleshootingDialog()
-    -- Show immediate feedback that the function was called
-    LrDialogs.message('Missing Opsin Troubleshooting', 'Running diagnostics...', 'info')
-    
     -- Wrap in error handling to ensure dialog always shows
     local success, error = pcall(function()
         local diagnostics = TroubleShoot.runDiagnostics()
@@ -40,7 +37,8 @@ function TroubleShoot.showTroubleshootingDialog()
                                "1. Restart Lightroom Classic\n" ..
                                "2. Reinstall the plugin\n" ..
                                "3. Check that all plugin files are present\n" ..
-                               "4. Verify Lightroom Classic version is 14.4 or later"
+                               "4. Verify Lightroom Classic version is 14.4 or later\n\n" ..
+                               "If the problem persists, please report this error on GitHub."
         
         LrDialogs.message("Missing Opsin Troubleshooting", fallbackMessage, "warning")
     end
