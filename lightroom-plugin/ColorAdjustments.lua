@@ -18,13 +18,7 @@ function ColorAdjustments.applyAdjustments(photo, adjustments)
     local catalog = LrApplication.activeCatalog()
     
     catalog:withWriteAccessDo("Apply TrueSight Color Adjustments", function()
-        -- Switch to Develop module if not already there
-        local currentModule = LrApplication.activeModule()
-        if currentModule ~= LrApplication.developModule() then
-            LrApplication.activateModule('develop')
-        end
-        
-        -- Select the photo
+        -- Select the photo first
         catalog:setSelectedPhotos(photo, {photo})
         
         -- Apply basic adjustments
