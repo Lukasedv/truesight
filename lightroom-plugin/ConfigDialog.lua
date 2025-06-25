@@ -9,7 +9,15 @@ local LrBinding = import 'LrBinding'
 local LrDialogs = import 'LrDialogs'
 local LrPrefs = import 'LrPrefs'
 
-local AzureOpenAI = require 'AzureOpenAI'
+-- Lazy loading of Azure OpenAI to prevent plugin loading failures
+local function getAzureOpenAI()
+    local success, module = pcall(require, 'AzureOpenAI')
+    if not success then
+        LrDialogs.message('TrueSight Error', 'Azure OpenAI module failed to load. Please check your installation.')
+        return nil
+    end
+    return module
+end
 
 local ConfigDialog = {}
 
@@ -21,8 +29,13 @@ function ConfigDialog.showConfigDialog()
         
         local props = LrBinding.makePropertyTable(context)
         
-        -- Load current configuration
-        local config = AzureOpenAI.getConfig()
+        -- Load current configuration with error handling
+        local AzureOpenAI = getAzureOpenAI()
+        local config = {}
+        if AzureOpenAI then
+            config = AzureOpenAI.getConfig()
+        end
+        
         props.azureEndpoint = config.endpoint or ''
         props.azureApiKey = config.apiKey or ''
         props.azureModel = config.model or 'gpt-4o'
@@ -138,6 +151,11 @@ function ConfigDialog.showConfigDialog()
 end
 
 function ConfigDialog.saveConfiguration(props)
+    local AzureOpenAI = getAzureOpenAI()
+    if not AzureOpenAI then
+        return
+    end
+    
     local config = {
         endpoint = props.azureEndpoint,
         apiKey = props.azureApiKey,
