@@ -15,7 +15,7 @@ Do not commit the real configuration file to version control or share it publicl
 
 Instructions:
 1. Open Lightroom Classic
-2. Go to Help > TrueSight Help
+2. Go to Help > Missing Opsin Help
 3. Click the configuration button
 4. Enter the Endpoint and API Key values from your real config file
 5. Set the Deployment Name as specified in your real config file

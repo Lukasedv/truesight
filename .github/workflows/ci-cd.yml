@@ -13,9 +13,37 @@ env:
   PLUGIN_VERSION: 1.0.0
 
 jobs:
-  validate:
-    name: Validate Plugin
+  # Check what files changed to determine what jobs to run
+  changes:
+    name: Detect Changes
     runs-on: ubuntu-latest
+    outputs:
+      plugin: ${{ steps.changes.outputs.plugin }}
+      infrastructure: ${{ steps.changes.outputs.infrastructure }}
+      docs: ${{ steps.changes.outputs.docs }}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Check for changes
+      uses: dorny/paths-filter@v2
+      id: changes
+      with:
+        filters: |
+          plugin:
+            - 'lightroom-plugin.lrplugin/**'
+          infrastructure:
+            - 'azure-infrastructure/**'
+          docs:
+            - 'docs/**'
+            - 'README.md'
+            - 'INSTALLATION.md'
+
+  validate-plugin:
+    name: Validate Missing Opsin Plugin
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.plugin == 'true'
     
     steps:
     - name: Checkout code
@@ -45,23 +73,33 @@ jobs:
         fi
         
         echo "Plugin structure validation passed"
-        
+
+  validate-infrastructure:
+    name: Validate TrueSight Infrastructure
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.infrastructure == 'true'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
     - name: Validate Azure ARM template
       run: |
         # Install Azure CLI
         curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
         
-        # Validate ARM template
+        # Validate ARM template syntax
         az deployment group validate \
           --resource-group "validation-rg" \
           --template-file azure-infrastructure/deploy-openai.json \
           --parameters openAiServiceName="validation-test" || echo "ARM template validation completed"
 
   package:
-    name: Package Plugin
+    name: Package Missing Opsin Plugin
     runs-on: ubuntu-latest
-    needs: validate
-    if: github.event_name == 'release'
+    needs: [changes, validate-plugin]
+    if: github.event_name == 'release' && needs.changes.outputs.plugin == 'true'
     
     steps:
     - name: Checkout code
@@ -102,10 +140,10 @@ jobs:
         asset_content_type: application/zip
 
   deploy-infrastructure:
-    name: Deploy Azure Infrastructure
+    name: Deploy TrueSight Azure Infrastructure
     runs-on: ubuntu-latest
-    needs: validate
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs: [changes, validate-infrastructure]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push' && needs.changes.outputs.infrastructure == 'true'
     environment: production
     
     steps:
@@ -117,28 +155,21 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
         
-    - name: Deploy Azure OpenAI
+    - name: Deploy Azure OpenAI (TrueSight backend)
       run: |
-        # Set variables
-        RESOURCE_GROUP_NAME="missing-opsin-prod-rg"
-        LOCATION="eastus"
-        DEPLOYMENT_NAME="missing-opsin-$(date +%Y%m%d-%H%M%S)"
+        cd azure-infrastructure
         
-        # Create resource group
-        az group create \
-          --name "$RESOURCE_GROUP_NAME" \
-          --location "$LOCATION"
+        # Set environment variables for deployment (keeping TrueSight naming for Azure)
+        export RESOURCE_GROUP_NAME="truesight-prod-rg"
+        export LOCATION="eastus"
+        export OPENAI_SERVICE_NAME="truesight-openai-prod"
+        export DEPLOYMENT_NAME="gpt-4o-prod"
         
-        # Deploy ARM template
-        az deployment group create \
-          --resource-group "$RESOURCE_GROUP_NAME" \
-          --template-file azure-infrastructure/deploy-openai.json \
-          --name "$DEPLOYMENT_NAME" \
-          --parameters \
-            openAiServiceName="missing-opsin-openai-prod" \
-            deploymentName="gpt-4o-prod"
-            
-        echo "Infrastructure deployment completed"
+        # Run deployment script
+        chmod +x deploy.sh
+        ./deploy.sh
+        
+        echo "TrueSight infrastructure deployment completed"
 
   security-scan:
     name: Security Scan
@@ -166,8 +197,8 @@ jobs:
   documentation:
     name: Update Documentation
     runs-on: ubuntu-latest
-    needs: validate
-    if: github.ref == 'refs/heads/main'
+    needs: [changes, validate-plugin]
+    if: github.ref == 'refs/heads/main' && needs.changes.outputs.docs == 'true'
     
     steps:
     - name: Checkout code

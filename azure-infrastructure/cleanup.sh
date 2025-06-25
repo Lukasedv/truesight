@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # TrueSight Azure Infrastructure Cleanup Script
-# This script safely removes Azure OpenAI resources deployed for the TrueSight plugin
+# This script safely removes Azure OpenAI resources deployed for the Missing Opsin plugin
 
 set -euo pipefail
 
@@ -32,7 +32,7 @@ show_usage() {
     cat << EOF
 Usage: $0 [OPTIONS]
 
-Cleanup Azure OpenAI infrastructure for TrueSight Lightroom plugin.
+Cleanup Azure OpenAI infrastructure for Missing Opsin Lightroom plugin.
 
 Environment Variables:
   RESOURCE_GROUP_NAME    Name of the resource group to cleanup (default: truesight-rg)

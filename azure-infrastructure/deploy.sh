@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # TrueSight Azure Infrastructure Deployment Script
-# This script deploys the required Azure OpenAI resources for the TrueSight plugin
+# This script deploys the required Azure OpenAI resources for the Missing Opsin plugin
 # with robust error handling and idempotent operations
 
 # Exit on error, but handle errors gracefully
@@ -38,7 +38,7 @@ show_usage() {
     cat << EOF
 Usage: $0 [OPTIONS]
 
-Deploy Azure OpenAI infrastructure for TrueSight Lightroom plugin.
+Deploy Azure OpenAI infrastructure for Missing Opsin Lightroom plugin.
 
 Environment Variables:
   RESOURCE_GROUP_NAME    Name of the resource group (default: truesight-rg)
@@ -383,7 +383,7 @@ Do not commit this file to version control or share it publicly.
 
 Instructions:
 1. Open Lightroom Classic
-2. Go to Help > TrueSight Help
+2. Go to Help > Missing Opsin Help
 3. Click the configuration button
 4. Enter the Endpoint and API Key values above
 5. Set the Deployment Name to: $deployment_name

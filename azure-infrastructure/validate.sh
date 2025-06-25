@@ -37,7 +37,7 @@ show_usage() {
     cat << EOF
 Usage: $0 [OPTIONS]
 
-Validate Azure OpenAI infrastructure for TrueSight Lightroom plugin.
+Validate Azure OpenAI infrastructure for Missing Opsin Lightroom plugin.
 
 Environment Variables:
   RESOURCE_GROUP_NAME    Name of the resource group (default: truesight-rg)

@@ -193,7 +193,7 @@ function ConfigDialog.saveConfiguration(props)
     local savedEndpoint = prefs.azureEndpoint or 'NOT SAVED'
     local savedDeployment = prefs.azureDeploymentName or 'NOT SAVED'
     
-    LrDialogs.message('TrueSight', 'Configuration saved successfully!\n\nEndpoint: ' .. savedEndpoint .. '\nDeployment: ' .. savedDeployment)
+    LrDialogs.message('Missing Opsin', 'Configuration saved successfully!\n\nEndpoint: ' .. savedEndpoint .. '\nDeployment: ' .. savedDeployment)
 end
 
 function ConfigDialog.testConnection(props)

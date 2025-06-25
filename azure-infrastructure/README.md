@@ -1,6 +1,6 @@
 # TrueSight Azure Infrastructure
 
-This directory contains the Azure infrastructure deployment scripts for the TrueSight Lightroom plugin. The infrastructure includes Azure OpenAI services required for the plugin's AI-powered image analysis capabilities.
+This directory contains the Azure infrastructure deployment scripts for the Missing Opsin Lightroom plugin. The infrastructure includes Azure OpenAI services required for the plugin's AI-powered image analysis capabilities.
 
 ## Overview
 
@@ -59,9 +59,9 @@ Before deploying the infrastructure, ensure you have:
 ./validate.sh --test-api --detailed
 ```
 
-### 3. Configure TrueSight Plugin
+### 3. Configure Missing Opsin Plugin
 
-After successful deployment, use the configuration values from `truesight-config.txt` to configure the TrueSight Lightroom plugin.
+After successful deployment, use the configuration values from `truesight-config.txt` to configure the Missing Opsin Lightroom plugin.
 
 ## Scripts
 
