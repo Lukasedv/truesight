@@ -36,7 +36,7 @@ TrueSight is a powerful Adobe Lightroom Classic plugin designed to help photogra
 2. **Install in Lightroom**
    - Open Lightroom Classic
    - Go to `File > Plug-in Manager`
-   - Click `Add` and select the `lightroom-plugin` folder
+   - Click `Add` and select the `lightroom-plugin.lrplugin` folder
    - Click `Done`
 
 3. **Deploy Azure Infrastructure**
@@ -98,7 +98,7 @@ TrueSight analyzes your photos for:
 3. **Validate Plugin Code**
    ```bash
    # Check Lua syntax
-   find lightroom-plugin -name "*.lua" -exec lua5.3 -l {} \;
+   find lightroom-plugin.lrplugin -name "*.lua" -exec lua5.3 -l {} \;
    
    # Validate Azure ARM template
    az deployment group validate \
@@ -109,7 +109,7 @@ TrueSight analyzes your photos for:
 ### Plugin Structure
 
 ```
-lightroom-plugin/
+lightroom-plugin.lrplugin/
 ├── Info.lua                 # Plugin manifest
 ├── ColorAnalysis.lua        # Main analysis module
 ├── AzureOpenAI.lua         # Azure OpenAI integration
@@ -308,7 +308,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Support
 
 - GitHub Issues: [Report bugs or request features](https://github.com/Lukasedv/truesight/issues)
-- Documentation: [User Guide](lightroom-plugin/help.html)
+- Documentation: [User Guide](lightroom-plugin.lrplugin/help.html)
 - Email: [Support Email] (configure as needed)
 
 ## 🗓️ Roadmap

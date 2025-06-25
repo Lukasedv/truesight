@@ -20,14 +20,14 @@ Before installing, verify your Lightroom Classic version:
 
 ### 2. Download Plugin
 
-Download the complete `lightroom-plugin` folder from the repository.
+Download the complete `lightroom-plugin.lrplugin` folder from the repository.
 
 ### 3. Install in Lightroom
 
 1. Open Adobe Lightroom Classic
 2. Navigate to `File > Plug-in Manager`
 3. Click the `Add` button
-4. Select the downloaded `lightroom-plugin` folder
+4. Select the downloaded `lightroom-plugin.lrplugin` folder
 5. Click `Done`
 
 ### 4. Verify Installation

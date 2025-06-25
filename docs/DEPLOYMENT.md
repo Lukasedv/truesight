@@ -33,7 +33,7 @@ This guide provides detailed instructions for deploying TrueSight in various env
 4. **Install Plugin in Lightroom**
    - Open Lightroom Classic
    - File > Plug-in Manager
-   - Add > Select `lightroom-plugin` folder
+   - Add > Select `lightroom-plugin.lrplugin` folder
    - Done
 
 5. **Configure Plugin**
@@ -79,7 +79,7 @@ This guide provides detailed instructions for deploying TrueSight in various env
 1. **Create Release Package**
    ```bash
    mkdir -p release
-   cp -r lightroom-plugin release/TrueSight.lrplugin
+   cp -r lightroom-plugin.lrplugin release/TrueSight.lrplugin
    cd release
    zip -r TrueSight-v1.0.0.zip TrueSight.lrplugin/
    ```
