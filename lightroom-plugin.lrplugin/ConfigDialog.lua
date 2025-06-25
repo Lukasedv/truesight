@@ -28,20 +28,20 @@ function ConfigDialog.showConfigDialog()
     local success, error = pcall(function()
         LrFunctionContext.callWithContext('configDialog', function(context)
             local f = LrView.osFactory()
+            local bind = LrView.bind
+            local share = LrView.share
             local LrColor = import('LrColor')
+            
+            -- Create property table
+            local props = LrBinding.makePropertyTable(context)
             
             -- Load current configuration
             local prefs = LrPrefs.prefsForPlugin()
-            local currentEndpoint = prefs.azureEndpoint or ''
-            local currentApiKey = prefs.azureApiKey or ''
-            local currentDeployment = prefs.azureDeploymentName or ''
             
-            -- Simple storage for field values (no complex binding)
-            local fieldValues = {
-                endpoint = currentEndpoint,
-                apiKey = currentApiKey,
-                deployment = currentDeployment
-            }
+            -- Initialize properties with current values
+            props.azureEndpoint = prefs.azureEndpoint or ''
+            props.azureApiKey = prefs.azureApiKey or ''
+            props.azureDeploymentName = prefs.azureDeploymentName or ''
             
             local contents = f:column {
                 spacing = f:control_spacing(),
@@ -64,18 +64,13 @@ function ConfigDialog.showConfigDialog()
                             f:static_text {
                                 title = 'Endpoint URL:',
                                 alignment = 'right',
-                                width = 120,
+                                width = share 'labelWidth',
                             },
                             
                             f:edit_field {
-                                value = currentEndpoint,
+                                value = bind 'azureEndpoint',
                                 width_in_chars = 50,
                                 immediate = true,
-                                value_to_string = function(value) return tostring(value or '') end,
-                                string_to_value = function(value) 
-                                    fieldValues.endpoint = tostring(value or '')
-                                    return fieldValues.endpoint 
-                                end,
                             },
                         },
                         
@@ -83,18 +78,13 @@ function ConfigDialog.showConfigDialog()
                             f:static_text {
                                 title = 'API Key:',
                                 alignment = 'right',
-                                width = 120,
+                                width = share 'labelWidth',
                             },
                             
                             f:password_field {
-                                value = currentApiKey,
+                                value = bind 'azureApiKey',
                                 width_in_chars = 50,
                                 immediate = true,
-                                value_to_string = function(value) return tostring(value or '') end,
-                                string_to_value = function(value) 
-                                    fieldValues.apiKey = tostring(value or '')
-                                    return fieldValues.apiKey 
-                                end,
                             },
                         },
                         
@@ -102,18 +92,13 @@ function ConfigDialog.showConfigDialog()
                             f:static_text {
                                 title = 'Deployment Name:',
                                 alignment = 'right',
-                                width = 120,
+                                width = share 'labelWidth',
                             },
                             
                             f:edit_field {
-                                value = currentDeployment,
+                                value = bind 'azureDeploymentName',
                                 width_in_chars = 30,
                                 immediate = true,
-                                value_to_string = function(value) return tostring(value or '') end,
-                                string_to_value = function(value) 
-                                    fieldValues.deployment = tostring(value or '')
-                                    return fieldValues.deployment 
-                                end,
                             },
                         },
                         
@@ -121,7 +106,7 @@ function ConfigDialog.showConfigDialog()
                             f:static_text {
                                 title = '',
                                 alignment = 'right',
-                                width = 120,
+                                width = share 'labelWidth',
                             },
                             
                             f:static_text {
@@ -139,7 +124,7 @@ function ConfigDialog.showConfigDialog()
                     f:push_button {
                         title = 'Test Connection',
                         action = function()
-                            ConfigDialog.testConnection(fieldValues)
+                            ConfigDialog.testConnection(props)
                         end,
                     },
                     
@@ -159,7 +144,7 @@ function ConfigDialog.showConfigDialog()
             })
             
             if result == 'ok' then
-                ConfigDialog.saveConfiguration(fieldValues)
+                ConfigDialog.saveConfiguration(props)
             end
         end)
     end)
@@ -170,11 +155,11 @@ function ConfigDialog.showConfigDialog()
     end
 end
 
-function ConfigDialog.saveConfiguration(fieldValues)
-    -- Trim whitespace from all values
-    local endpointValue = string.gsub(tostring(fieldValues.endpoint or ''), "^%s*(.-)%s*$", "%1")
-    local apiKeyValue = string.gsub(tostring(fieldValues.apiKey or ''), "^%s*(.-)%s*$", "%1")
-    local deploymentValue = string.gsub(tostring(fieldValues.deployment or ''), "^%s*(.-)%s*$", "%1")
+function ConfigDialog.saveConfiguration(props)
+    -- Get values from properties and trim whitespace
+    local endpointValue = string.gsub(tostring(props.azureEndpoint or ''), "^%s*(.-)%s*$", "%1")
+    local apiKeyValue = string.gsub(tostring(props.azureApiKey or ''), "^%s*(.-)%s*$", "%1")
+    local deploymentValue = string.gsub(tostring(props.azureDeploymentName or ''), "^%s*(.-)%s*$", "%1")
     
     -- Save to preferences
     local prefs = LrPrefs.prefsForPlugin()
@@ -201,11 +186,14 @@ function ConfigDialog.saveConfiguration(fieldValues)
     LrDialogs.message('Missing Opsin', 'Configuration saved successfully!\n\nEndpoint: ' .. savedEndpoint .. '\nDeployment: ' .. savedDeployment .. '\nAPI Key Length: ' .. savedApiKeyLength)
 end
 
-function ConfigDialog.testConnection(fieldValues)
-    -- Get current field values
-    local endpointValue = string.gsub(tostring(fieldValues.endpoint or ''), "^%s*(.-)%s*$", "%1")
-    local apiKeyValue = string.gsub(tostring(fieldValues.apiKey or ''), "^%s*(.-)%s*$", "%1")
-    local deploymentValue = string.gsub(tostring(fieldValues.deployment or ''), "^%s*(.-)%s*$", "%1")
+function ConfigDialog.testConnection(props)
+    -- Add a small delay to ensure property values are synchronized
+    LrTasks.sleep(0.1)
+    
+    -- Get current field values and trim whitespace
+    local endpointValue = string.gsub(tostring(props.azureEndpoint or ''), "^%s*(.-)%s*$", "%1")
+    local apiKeyValue = string.gsub(tostring(props.azureApiKey or ''), "^%s*(.-)%s*$", "%1")
+    local deploymentValue = string.gsub(tostring(props.azureDeploymentName or ''), "^%s*(.-)%s*$", "%1")
     
     -- Debug output
     local debugMsg = 'Debug Info:\n' ..
