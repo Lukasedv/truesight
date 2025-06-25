@@ -25,6 +25,8 @@ REQUIRED_FILES=(
     "ColorAdjustments.lua"
     "ExportDialog.lua"
     "ConfigDialog.lua"
+    "TroubleShoot.lua"
+    "PluginInit.lua"
     "help.html"
 )
 
