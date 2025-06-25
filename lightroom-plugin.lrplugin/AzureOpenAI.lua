@@ -26,7 +26,6 @@ function AzureOpenAI.getConfig()
     return {
         endpoint = prefs.azureEndpoint,
         apiKey = prefs.azureApiKey,
-        model = prefs.azureModel or DEFAULT_MODEL,
         deploymentName = prefs.azureDeploymentName,
     }
 end
@@ -36,7 +35,6 @@ function AzureOpenAI.setConfig(config)
     local prefs = LrPrefs.prefsForPlugin()
     prefs.azureEndpoint = config.endpoint
     prefs.azureApiKey = config.apiKey
-    prefs.azureModel = config.model
     prefs.azureDeploymentName = config.deploymentName
 end
 

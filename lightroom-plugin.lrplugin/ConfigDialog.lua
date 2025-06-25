@@ -44,14 +44,13 @@ function ConfigDialog.showConfigDialog()
             -- Initialize properties with defaults, ensuring they're never nil
             props.azureEndpoint = config.endpoint or ''
             props.azureApiKey = config.apiKey or ''
-            props.azureModel = config.model or 'gpt-4o'
             props.azureDeploymentName = config.deploymentName or ''
             
-            -- Ensure all properties are properly bound
-            props:addObserver('azureEndpoint', function() end)
-            props:addObserver('azureApiKey', function() end)
-            props:addObserver('azureModel', function() end)
-            props:addObserver('azureDeploymentName', function() end)
+            -- Debug: Load preferences directly as fallback
+            local prefs = LrPrefs.prefsForPlugin()
+            if props.azureEndpoint == '' then props.azureEndpoint = prefs.azureEndpoint or '' end
+            if props.azureApiKey == '' then props.azureApiKey = prefs.azureApiKey or '' end
+            if props.azureDeploymentName == '' then props.azureDeploymentName = prefs.azureDeploymentName or '' end
         
         local contents = f:column {
             spacing = f:control_spacing(),
@@ -100,23 +99,6 @@ function ConfigDialog.showConfigDialog()
                     
                     f:row {
                         f:static_text {
-                            title = 'Model:',
-                            alignment = 'right',
-                            width = share 'labelWidth',
-                        },
-                        
-                        f:popup_menu {
-                            value = bind 'azureModel',
-                            items = {
-                                { title = 'GPT-4 Vision (gpt-4o)', value = 'gpt-4o' },
-                                { title = 'GPT-4 Vision Preview', value = 'gpt-4-vision-preview' },
-                                { title = 'GPT-4 Turbo', value = 'gpt-4-turbo' },
-                            },
-                        },
-                    },
-                    
-                    f:row {
-                        f:static_text {
                             title = 'Deployment Name:',
                             alignment = 'right',
                             width = share 'labelWidth',
@@ -126,6 +108,20 @@ function ConfigDialog.showConfigDialog()
                             value = bind 'azureDeploymentName',
                             width_in_chars = 30,
                             immediate = true,
+                        },
+                    },
+                    
+                    f:row {
+                        f:static_text {
+                            title = '',
+                            alignment = 'right',
+                            width = share 'labelWidth',
+                        },
+                        
+                        f:static_text {
+                            title = 'Enter the deployment name from your Azure OpenAI service (e.g., gpt-4o-deployment)',
+                            text_color = LrColor(0.6, 0.6, 0.6),
+                            width_in_chars = 50,
                         },
                     },
                 },
@@ -176,54 +172,68 @@ function ConfigDialog.showConfigDialog()
 end
 
 function ConfigDialog.saveConfiguration(props)
-    local AzureOpenAI = getAzureOpenAI(true)  -- Silent mode
+    -- Save directly to preferences - this is more reliable
+    local prefs = LrPrefs.prefsForPlugin()
+    prefs.azureEndpoint = props.azureEndpoint or ''
+    prefs.azureApiKey = props.azureApiKey or ''
+    prefs.azureDeploymentName = props.azureDeploymentName or ''
     
+    -- Also try to save via AzureOpenAI module if available
+    local AzureOpenAI = getAzureOpenAI(true)  -- Silent mode
     if AzureOpenAI then
-        -- Use AzureOpenAI module to save config
         local config = {
             endpoint = props.azureEndpoint,
             apiKey = props.azureApiKey,
-            model = props.azureModel,
             deploymentName = props.azureDeploymentName,
         }
         AzureOpenAI.setConfig(config)
-    else
-        -- Fallback: save directly to preferences
-        local prefs = LrPrefs.prefsForPlugin()
-        prefs.azureEndpoint = props.azureEndpoint
-        prefs.azureApiKey = props.azureApiKey
-        prefs.azureModel = props.azureModel
-        prefs.azureDeploymentName = props.azureDeploymentName
     end
     
-    LrDialogs.message('Missing Opsin', 'Configuration saved successfully.')
+    -- Verify the save worked
+    local savedEndpoint = prefs.azureEndpoint or 'NOT SAVED'
+    local savedDeployment = prefs.azureDeploymentName or 'NOT SAVED'
+    
+    LrDialogs.message('TrueSight', 'Configuration saved successfully!\n\nEndpoint: ' .. savedEndpoint .. '\nDeployment: ' .. savedDeployment)
 end
 
 function ConfigDialog.testConnection(props)
-    -- Debug: Log the current values
-    local endpointValue = props.azureEndpoint or ''
-    local apiKeyValue = props.azureApiKey or ''
-    local deploymentValue = props.azureDeploymentName or ''
+    -- Force update the properties from the UI fields
+    -- This is a workaround for potential binding issues
+    local endpointValue = tostring(props.azureEndpoint or '')
+    local apiKeyValue = tostring(props.azureApiKey or '')
+    local deploymentValue = tostring(props.azureDeploymentName or '')
+    
+    -- Trim whitespace
+    endpointValue = string.gsub(endpointValue, "^%s*(.-)%s*$", "%1")
+    apiKeyValue = string.gsub(apiKeyValue, "^%s*(.-)%s*$", "%1")
+    deploymentValue = string.gsub(deploymentValue, "^%s*(.-)%s*$", "%1")
+    
+    -- Debug output
+    local debugMsg = 'Debug Info:\n' ..
+                    'Endpoint length: ' .. string.len(endpointValue) .. '\n' ..
+                    'Endpoint value: "' .. endpointValue .. '"\n' ..
+                    'API Key length: ' .. string.len(apiKeyValue) .. '\n' ..
+                    'Deployment: "' .. deploymentValue .. '"'
     
     -- Basic validation with detailed error messages
     if endpointValue == '' then
-        LrDialogs.message('Configuration Error', 'Please enter the Azure OpenAI endpoint URL.\n\nThe endpoint should look like:\nhttps://your-service-name.openai.azure.com/')
+        LrDialogs.message('Configuration Error', 'Please enter the Azure OpenAI endpoint URL.\n\n' .. debugMsg)
         return
     end
     
-    -- Validate endpoint format
-    if not string.match(endpointValue, '^https://.*%.openai%.azure%.com/?$') then
-        LrDialogs.message('Configuration Error', 'Invalid endpoint URL format.\n\nThe endpoint should look like:\nhttps://your-service-name.openai.azure.com/\n\nCurrent value: ' .. endpointValue)
+    -- More flexible endpoint format validation
+    if not (string.find(endpointValue, 'openai%.azure%.com') and string.find(endpointValue, 'https://')) then
+        LrDialogs.message('Configuration Error', 'Invalid endpoint URL format.\n\nThe endpoint should look like:\nhttps://your-service-name.openai.azure.com/\n\nCurrent value: "' .. endpointValue .. '"\n\n' .. debugMsg)
         return
     end
     
     if apiKeyValue == '' then
-        LrDialogs.message('Configuration Error', 'Please enter the Azure OpenAI API key.')
+        LrDialogs.message('Configuration Error', 'Please enter the Azure OpenAI API key.\n\n' .. debugMsg)
         return
     end
     
     if deploymentValue == '' then
-        LrDialogs.message('Configuration Error', 'Please enter the deployment name (e.g., gpt-4o-deployment).')
+        LrDialogs.message('Configuration Error', 'Please enter the deployment name (e.g., gpt-4o-deployment).\n\n' .. debugMsg)
         return
     end
     
