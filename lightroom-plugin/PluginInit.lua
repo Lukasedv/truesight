@@ -20,6 +20,32 @@ local function initPlugin()
     local version = app.versionString or "Unknown"
     pluginLogger:info("Lightroom version: " .. version)
     
+    -- Extract and check version compatibility
+    local versionNumber = version:match("(%d+%.%d+)")
+    if versionNumber then
+        local majorVersion = tonumber(versionNumber:match("(%d+)%."))
+        local minorVersion = tonumber(versionNumber:match("%.(%d+)"))
+        
+        -- Check if version is 14.4 or later
+        local isCompatible = (majorVersion > 14) or (majorVersion == 14 and minorVersion >= 4)
+        
+        if not isCompatible then
+            local warningMsg = "TrueSight Plugin Warning:\n\n" ..
+                             "This plugin requires Lightroom Classic 14.4 or later.\n" ..
+                             "Current version: " .. version .. "\n\n" ..
+                             "The plugin may not function correctly. Please update Lightroom Classic."
+            
+            pluginLogger:warn("Version compatibility issue: " .. version)
+            
+            -- Show warning but don't prevent loading entirely
+            LrDialogs.message("TrueSight Compatibility Warning", warningMsg, "warning")
+        else
+            pluginLogger:info("Version compatibility: OK")
+        end
+    else
+        pluginLogger:warn("Could not determine Lightroom version compatibility")
+    end
+    
     -- Check if required modules can be loaded
     local modules = {
         'AzureOpenAI',

@@ -27,8 +27,23 @@ function TroubleShoot.runDiagnostics()
     
     -- Check Lightroom version
     local app = LrApplication
-    local versionInfo = "Lightroom Version: " .. (app.versionString or "Unknown")
+    local versionString = app.versionString or "Unknown"
+    local versionInfo = "Lightroom Version: " .. versionString
     table.insert(results, versionInfo)
+    
+    -- Extract version number for compatibility check
+    local versionNumber = versionString:match("(%d+%.%d+)")
+    if versionNumber then
+        local majorVersion = tonumber(versionNumber:match("(%d+)%."))
+        local minorVersion = tonumber(versionNumber:match("%.(%d+)"))
+        
+        -- Check compatibility (14.4 or later)
+        local isCompatible = (majorVersion > 14) or (majorVersion == 14 and minorVersion >= 4)
+        local compatStatus = isCompatible and "✓ Compatible" or "✗ Requires 14.4+"
+        table.insert(results, "Compatibility: " .. compatStatus)
+    else
+        table.insert(results, "Compatibility: ⚠ Could not determine version")
+    end
     
     -- Check OS information
     local osInfo = "Operating System: " .. LrSystemInfo.summaryString()
@@ -67,10 +82,24 @@ function TroubleShoot.runDiagnostics()
         {name = "ExportDialog", file = "ExportDialog"}
     }
     
+    local moduleErrors = {}
     for _, module in ipairs(modules) do
         local success, result = pcall(require, module.file)
-        local status = success and "✓ OK" or ("✗ ERROR: " .. tostring(result))
-        table.insert(results, "  " .. module.name .. ": " .. status)
+        if success then
+            table.insert(results, "  " .. module.name .. ": ✓ OK")
+        else
+            local errorMsg = tostring(result)
+            table.insert(results, "  " .. module.name .. ": ✗ ERROR")
+            table.insert(moduleErrors, module.name .. ": " .. errorMsg)
+        end
+    end
+    
+    -- Report detailed module errors if any
+    if #moduleErrors > 0 then
+        table.insert(results, "\nModule Error Details:")
+        for _, error in ipairs(moduleErrors) do
+            table.insert(results, "  " .. error)
+        end
     end
     
     -- Check configuration
