@@ -15,9 +15,15 @@ TrueSight is a powerful Adobe Lightroom Classic plugin designed to help photogra
 
 ### Prerequisites
 
-- Adobe Lightroom Classic (version 6.0 or later)
+- Adobe Lightroom Classic (version 14.4 or later)
 - Azure subscription with OpenAI access
 - Basic understanding of photo editing
+
+### Compatibility
+
+- **Lightroom Classic**: Version 14.4 or later
+- **SDK Version**: 13.0 (minimum 10.0)
+- **Operating Systems**: Windows and macOS
 
 ### Installation
 
@@ -110,8 +116,44 @@ lightroom-plugin/
 ├── ColorAdjustments.lua    # Lightroom adjustment application
 ├── ExportDialog.lua        # Export interface
 ├── ConfigDialog.lua        # Configuration interface
+├── TroubleShoot.lua        # Troubleshooting diagnostics
+├── PluginInit.lua          # Plugin initialization
 └── help.html               # User documentation
 ```
+
+## 🔧 Troubleshooting
+
+### Plugin Not Loading
+
+If TrueSight doesn't appear in Lightroom menus:
+
+1. **Check Compatibility**: Ensure you're using Lightroom Classic 14.4 or later
+2. **Plugin Manager**: Go to `File > Plug-in Manager` to verify TrueSight is listed
+3. **Run Diagnostics**: Use `Help > TrueSight Troubleshooting` for detailed checks
+4. **Restart Lightroom**: Close and reopen Lightroom Classic
+5. **Reinstall Plugin**: Remove and re-add the plugin if necessary
+
+### Common Issues
+
+- **SDK Version Error**: Update to Lightroom Classic 14.4 or later
+- **Module Loading Errors**: Check that all required files are present
+- **Configuration Issues**: Verify Azure OpenAI endpoint and API key
+- **Network Problems**: Ensure internet connectivity for Azure services
+
+### Diagnostic Tools
+
+The plugin includes built-in diagnostics accessible via `Help > TrueSight Troubleshooting`:
+
+- Plugin installation verification
+- Lightroom compatibility checks
+- Module loading tests
+- Azure OpenAI configuration validation
+
+### Getting Help
+
+- Use the built-in troubleshooting tool first
+- Check the [GitHub Issues](https://github.com/Lukasedv/truesight/issues) page
+- Review the help documentation within Lightroom
 
 ## 🛠️ Azure Infrastructure
 
