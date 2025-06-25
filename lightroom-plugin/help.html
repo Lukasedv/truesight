@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TrueSight - Color Deficiency Assistant Help</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #333; }
+        h2 { color: #666; }
+        code { background-color: #f5f5f5; padding: 2px 4px; border-radius: 3px; }
+        .important { background-color: #fff3cd; padding: 10px; border-left: 4px solid #ffc107; margin: 10px 0; }
+        .step { margin: 10px 0; padding: 10px; background-color: #f8f9fa; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>TrueSight - Color Deficiency Assistant</h1>
+    
+    <h2>Overview</h2>
+    <p>TrueSight is a Lightroom plugin designed to help photographers with color deficiency (color blindness) analyze and correct their photos using AI-powered color analysis.</p>
+    
+    <h2>Features</h2>
+    <ul>
+        <li>AI-powered color analysis using Azure OpenAI</li>
+        <li>Automatic color correction suggestions</li>
+        <li>One-click application of adjustments</li>
+        <li>Support for various types of color deficiency</li>
+        <li>Batch processing capabilities</li>
+    </ul>
+    
+    <h2>Setup Instructions</h2>
+    
+    <div class="step">
+        <h3>Step 1: Install the Plugin</h3>
+        <ol>
+            <li>Download the TrueSight plugin folder</li>
+            <li>In Lightroom Classic, go to <strong>File > Plug-in Manager</strong></li>
+            <li>Click <strong>Add</strong> and select the TrueSight plugin folder</li>
+            <li>Click <strong>Done</strong></li>
+        </ol>
+    </div>
+    
+    <div class="step">
+        <h3>Step 2: Configure Azure OpenAI</h3>
+        <ol>
+            <li>Create an Azure OpenAI service in your Azure subscription</li>
+            <li>Deploy a GPT-4 Vision model</li>
+            <li>Copy the endpoint URL and API key</li>
+            <li>In Lightroom, go to <strong>Help > TrueSight Help</strong></li>
+            <li>Click the configuration button and enter your Azure OpenAI details</li>
+        </ol>
+    </div>
+    
+    <div class="important">
+        <strong>Important:</strong> You need an Azure subscription and Azure OpenAI access to use this plugin. The service may incur costs based on usage.
+    </div>
+    
+    <h2>Using TrueSight</h2>
+    
+    <h3>Analyze Individual Photos</h3>
+    <ol>
+        <li>Select one or more photos in the Library module</li>
+        <li>Go to <strong>Library > TrueSight Color Analysis</strong></li>
+        <li>The plugin will analyze each photo and provide suggestions</li>
+        <li>Review the suggestions and click <strong>Apply Adjustments</strong> if desired</li>
+    </ol>
+    
+    <h3>Export with Analysis</h3>
+    <ol>
+        <li>Select photos to export</li>
+        <li>Go to <strong>File > Export > Analyze Colors with TrueSight</strong></li>
+        <li>Choose your analysis and export options</li>
+        <li>Click <strong>Export</strong></li>
+    </ol>
+    
+    <h2>Understanding the Analysis</h2>
+    
+    <p>TrueSight provides detailed feedback on:</p>
+    <ul>
+        <li><strong>Color Balance:</strong> Overall color temperature and tint issues</li>
+        <li><strong>Skin Tones:</strong> Natural skin color reproduction</li>
+        <li><strong>Color Harmony:</strong> Pleasing color relationships</li>
+        <li><strong>Contrast:</strong> Optimal contrast for visual appeal</li>
+        <li><strong>Specific Adjustments:</strong> Precise Lightroom slider values</li>
+    </ul>
+    
+    <h2>Troubleshooting</h2>
+    
+    <h3>Common Issues</h3>
+    <ul>
+        <li><strong>Connection Error:</strong> Verify your Azure OpenAI endpoint and API key</li>
+        <li><strong>Slow Analysis:</strong> Large images may take longer to process</li>
+        <li><strong>No Suggestions:</strong> Some images may not need adjustments</li>
+    </ul>
+    
+    <h3>Support</h3>
+    <p>For technical support, please visit the <a href="https://github.com/Lukasedv/truesight">TrueSight GitHub repository</a>.</p>
+    
+    <h2>Privacy and Data Usage</h2>
+    <p>TrueSight sends your photos to Azure OpenAI for analysis. Please review Azure's privacy policy and ensure you're comfortable with this data usage. No photos are stored permanently by the service.</p>
+    
+    <h2>Version Information</h2>
+    <p>TrueSight v1.0.0 - Initial release</p>
+</body>
+</html>

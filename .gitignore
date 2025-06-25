@@ -1,0 +1,51 @@
+# .gitignore for TrueSight project
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Build artifacts
+dist/
+build/
+release/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+*.log
+
+# Azure files
+*.azds.yaml
+.azure/
+
+# Configuration files with secrets
+*config.txt
+*credentials.json
+
+# Lightroom temp files
+*.lrcat-lock
+*.lrdata
+
+# Node modules (if any)
+node_modules/
+
+# Python cache (if any)
+__pycache__/
+*.pyc
+
+# Test files
+test-*.jpg
+test-*.png
+test-*.tiff
+
+# Local development overrides
+local-config.lua
+dev-settings.lua
