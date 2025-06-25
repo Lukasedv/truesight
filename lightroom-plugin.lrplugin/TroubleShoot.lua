@@ -27,7 +27,7 @@ function TroubleShoot.runDiagnostics()
     
     -- Check Lightroom version
     local app = LrApplication
-    local versionString = app.versionString or "Unknown"
+    local versionString = app.versionString() or "Unknown"
     local versionInfo = "Lightroom Version: " .. versionString
     table.insert(results, versionInfo)
     
