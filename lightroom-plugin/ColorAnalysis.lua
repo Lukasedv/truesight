@@ -160,4 +160,4 @@ function ColorAnalysis.createResultsDialog(analysis)
     }
 end
 
-return ColorAnalysis.analyzeSelectedPhotos()
+return ColorAnalysis.analyzeSelectedPhotos

@@ -165,5 +165,5 @@ function ConfigDialog.testConnection(props)
     LrDialogs.message('Connection Test', 'Configuration appears valid. Click Save to store the settings.')
 end
 
--- Run the configuration dialog
-return ConfigDialog.showConfigDialog()
+-- Export the module
+return ConfigDialog.showConfigDialog

@@ -110,5 +110,5 @@ function ExportDialog.processExport(props)
     LrDialogs.message('TrueSight Export', 'Analysis complete. Photos ready for standard export.')
 end
 
--- Run the export dialog
-return ExportDialog.showDialog()
+-- Export the module
+return ExportDialog.showDialog
