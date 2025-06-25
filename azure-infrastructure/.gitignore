@@ -1,0 +1,29 @@
+# Azure Infrastructure - Additional Security Protections
+# This supplements the root .gitignore with Azure-specific patterns
+
+# Azure deployment outputs that may contain sensitive data
+deployment-output.json
+deployment-*.json
+
+# Azure CLI command outputs
+az-output.json
+azure-*.json
+
+# Infrastructure backup files
+*.bak
+*.backup
+
+# Any files explicitly containing keys, secrets, tokens
+# (root .gitignore covers *config.txt, but these are extra specific)
+*key*
+*secret*
+*token*
+*credential*
+
+# ARM template parameter files that might contain secrets
+*.parameters.json
+*-params.json
+
+# But allow the example files (they have fake data)
+!*.example.*
+!*-example.*

@@ -1,0 +1,21 @@
+TrueSight Configuration (EXAMPLE - NOT REAL VALUES)
+===============================================
+Resource Group: truesight-rg
+OpenAI Service Name: truesight-openai-abc123def456
+Endpoint: https://truesight-openai-abc123def456.openai.azure.com/
+Deployment Name: gpt-4o-deployment
+API Key: 1234567890abcdef1234567890abcdef
+
+⚠️  EXAMPLE FILE ONLY - These are not real credentials ⚠️
+The actual configuration file will be created by the deploy.sh script
+and will contain your real API keys and endpoints.
+
+SECURITY WARNING: The real configuration file contains sensitive API keys. 
+Do not commit the real configuration file to version control or share it publicly.
+
+Instructions:
+1. Open Lightroom Classic
+2. Go to Help > TrueSight Help
+3. Click the configuration button
+4. Enter the Endpoint and API Key values from your real config file
+5. Set the Deployment Name as specified in your real config file

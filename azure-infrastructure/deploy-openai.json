@@ -1,20 +1,63 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
+    "metadata": {
+        "description": "Deploy Azure OpenAI service and model deployment for TrueSight Lightroom plugin",
+        "author": "TrueSight"
+    },
     "parameters": {
         "openAiServiceName": {
             "type": "string",
             "metadata": {
-                "description": "Name of the Azure OpenAI service"
+                "description": "Name of the Azure OpenAI service. Must be globally unique."
             },
-            "defaultValue": "[concat('missing-opsin-openai-', uniqueString(resourceGroup().id))]"
+            "defaultValue": "[concat('truesight-openai-', uniqueString(resourceGroup().id))]",
+            "minLength": 2,
+            "maxLength": 64
         },
         "location": {
             "type": "string",
             "defaultValue": "[resourceGroup().location]",
             "metadata": {
-                "description": "Location for all resources"
-            }
+                "description": "Location for all resources. Must support Azure OpenAI."
+            },
+            "allowedValues": [
+                "eastus",
+                "eastus2",
+                "westus",
+                "westus2",
+                "westus3",
+                "centralus",
+                "northcentralus",
+                "southcentralus",
+                "westcentralus",
+                "canadaeast",
+                "canadacentral",
+                "northeurope",
+                "westeurope",
+                "uksouth",
+                "ukwest",
+                "francecentral",
+                "francesouth",
+                "switzerlandnorth",
+                "germanywestcentral",
+                "norwayeast",
+                "switzerlandwest",
+                "japaneast",
+                "japanwest",
+                "southeastasia",
+                "eastasia",
+                "australiaeast",
+                "australiasoutheast",
+                "koreacentral",
+                "koreasouth",
+                "southafricanorth",
+                "uaenorth",
+                "brazilsouth",
+                "centralindia",
+                "southindia",
+                "westindia"
+            ]
         },
         "sku": {
             "type": "string",
@@ -31,15 +74,20 @@
             "defaultValue": "gpt-4o-deployment",
             "metadata": {
                 "description": "Name of the model deployment"
-            }
+            },
+            "minLength": 1,
+            "maxLength": 64
         },
         "modelName": {
             "type": "string",
             "defaultValue": "gpt-4o",
             "allowedValues": [
                 "gpt-4o",
+                "gpt-4o-mini",
+                "gpt-4-turbo",
                 "gpt-4-vision-preview",
-                "gpt-4-turbo"
+                "gpt-4",
+                "gpt-35-turbo"
             ],
             "metadata": {
                 "description": "The model to deploy"
@@ -47,7 +95,7 @@
         },
         "modelVersion": {
             "type": "string",
-            "defaultValue": "2024-05-13",
+            "defaultValue": "2024-08-06",
             "metadata": {
                 "description": "The version of the model to deploy"
             }
@@ -55,41 +103,76 @@
         "deploymentCapacity": {
             "type": "int",
             "defaultValue": 20,
+            "minValue": 1,
+            "maxValue": 1000,
             "metadata": {
                 "description": "The capacity of the deployment (in thousands of tokens per minute)"
             }
+        },
+        "publicNetworkAccess": {
+            "type": "string",
+            "defaultValue": "Enabled",
+            "allowedValues": [
+                "Enabled",
+                "Disabled"
+            ],
+            "metadata": {
+                "description": "Whether the service allows public network access"
+            }
+        },
+        "tags": {
+            "type": "object",
+            "defaultValue": {
+                "Application": "TrueSight",
+                "Component": "OpenAI",
+                "Environment": "Production"
+            },
+            "metadata": {
+                "description": "Tags to apply to all resources"
+            }
         }
     },
-    "variables": {},
+    "variables": {
+        "openAiServiceName": "[toLower(parameters('openAiServiceName'))]"
+    },
     "resources": [
         {
             "type": "Microsoft.CognitiveServices/accounts",
-            "apiVersion": "2023-05-01",
-            "name": "[parameters('openAiServiceName')]",
+            "apiVersion": "2023-10-01-preview",
+            "name": "[variables('openAiServiceName')]",
             "location": "[parameters('location')]",
+            "tags": "[parameters('tags')]",
             "sku": {
                 "name": "[parameters('sku')]"
             },
             "kind": "OpenAI",
+            "identity": {
+                "type": "SystemAssigned"
+            },
             "properties": {
                 "apiProperties": {},
-                "customSubDomainName": "[parameters('openAiServiceName')]",
-                "publicNetworkAccess": "Enabled"
+                "customSubDomainName": "[variables('openAiServiceName')]",
+                "publicNetworkAccess": "[parameters('publicNetworkAccess')]",
+                "networkAcls": {
+                    "defaultAction": "[if(equals(parameters('publicNetworkAccess'), 'Enabled'), 'Allow', 'Deny')]"
+                }
             }
         },
         {
             "type": "Microsoft.CognitiveServices/accounts/deployments",
-            "apiVersion": "2023-05-01",
-            "name": "[concat(parameters('openAiServiceName'), '/', parameters('deploymentName'))]",
+            "apiVersion": "2023-10-01-preview",
+            "name": "[format('{0}/{1}', variables('openAiServiceName'), parameters('deploymentName'))]",
             "dependsOn": [
-                "[resourceId('Microsoft.CognitiveServices/accounts', parameters('openAiServiceName'))]"
+                "[resourceId('Microsoft.CognitiveServices/accounts', variables('openAiServiceName'))]"
             ],
             "properties": {
                 "model": {
                     "format": "OpenAI",
                     "name": "[parameters('modelName')]",
                     "version": "[parameters('modelVersion')]"
-                }
+                },
+                "versionUpgradeOption": "OnceNewDefaultVersionAvailable",
+                "raiPolicyName": "Microsoft.Default"
             },
             "sku": {
                 "name": "Standard",
@@ -100,19 +183,59 @@
     "outputs": {
         "openAiServiceName": {
             "type": "string",
-            "value": "[parameters('openAiServiceName')]"
+            "value": "[variables('openAiServiceName')]",
+            "metadata": {
+                "description": "The name of the created OpenAI service"
+            }
         },
         "openAiEndpoint": {
             "type": "string",
-            "value": "[reference(resourceId('Microsoft.CognitiveServices/accounts', parameters('openAiServiceName'))).endpoint]"
+            "value": "[reference(resourceId('Microsoft.CognitiveServices/accounts', variables('openAiServiceName'))).endpoint]",
+            "metadata": {
+                "description": "The endpoint URL of the OpenAI service"
+            }
         },
         "deploymentName": {
             "type": "string",
-            "value": "[parameters('deploymentName')]"
+            "value": "[parameters('deploymentName')]",
+            "metadata": {
+                "description": "The name of the model deployment"
+            }
         },
         "resourceGroupName": {
             "type": "string",
-            "value": "[resourceGroup().name]"
+            "value": "[resourceGroup().name]",
+            "metadata": {
+                "description": "The name of the resource group"
+            }
+        },
+        "location": {
+            "type": "string",
+            "value": "[parameters('location')]",
+            "metadata": {
+                "description": "The deployment location"
+            }
+        },
+        "modelName": {
+            "type": "string",
+            "value": "[parameters('modelName')]",
+            "metadata": {
+                "description": "The deployed model name"
+            }
+        },
+        "modelVersion": {
+            "type": "string",
+            "value": "[parameters('modelVersion')]",
+            "metadata": {
+                "description": "The deployed model version"
+            }
+        },
+        "deploymentCapacity": {
+            "type": "int",
+            "value": "[parameters('deploymentCapacity')]",
+            "metadata": {
+                "description": "The deployment capacity in thousands of tokens per minute"
+            }
         }
     }
 }

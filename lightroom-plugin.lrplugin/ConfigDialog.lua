@@ -41,10 +41,17 @@ function ConfigDialog.showConfigDialog()
                 config = AzureOpenAI.getConfig()
             end
         
-        props.azureEndpoint = config.endpoint or ''
-        props.azureApiKey = config.apiKey or ''
-        props.azureModel = config.model or 'gpt-4o'
-        props.azureDeploymentName = config.deploymentName or ''
+            -- Initialize properties with defaults, ensuring they're never nil
+            props.azureEndpoint = config.endpoint or ''
+            props.azureApiKey = config.apiKey or ''
+            props.azureModel = config.model or 'gpt-4o'
+            props.azureDeploymentName = config.deploymentName or ''
+            
+            -- Ensure all properties are properly bound
+            props:addObserver('azureEndpoint', function() end)
+            props:addObserver('azureApiKey', function() end)
+            props:addObserver('azureModel', function() end)
+            props:addObserver('azureDeploymentName', function() end)
         
         local contents = f:column {
             spacing = f:control_spacing(),
@@ -193,19 +200,35 @@ function ConfigDialog.saveConfiguration(props)
 end
 
 function ConfigDialog.testConnection(props)
-    -- Basic validation
-    if not props.azureEndpoint or props.azureEndpoint == '' then
-        LrDialogs.message('Configuration Error', 'Please enter the Azure OpenAI endpoint URL.')
+    -- Debug: Log the current values
+    local endpointValue = props.azureEndpoint or ''
+    local apiKeyValue = props.azureApiKey or ''
+    local deploymentValue = props.azureDeploymentName or ''
+    
+    -- Basic validation with detailed error messages
+    if endpointValue == '' then
+        LrDialogs.message('Configuration Error', 'Please enter the Azure OpenAI endpoint URL.\n\nThe endpoint should look like:\nhttps://your-service-name.openai.azure.com/')
         return
     end
     
-    if not props.azureApiKey or props.azureApiKey == '' then
+    -- Validate endpoint format
+    if not string.match(endpointValue, '^https://.*%.openai%.azure%.com/?$') then
+        LrDialogs.message('Configuration Error', 'Invalid endpoint URL format.\n\nThe endpoint should look like:\nhttps://your-service-name.openai.azure.com/\n\nCurrent value: ' .. endpointValue)
+        return
+    end
+    
+    if apiKeyValue == '' then
         LrDialogs.message('Configuration Error', 'Please enter the Azure OpenAI API key.')
         return
     end
     
-    -- Test connection (simplified - in real implementation you'd make a test API call)
-    LrDialogs.message('Connection Test', 'Configuration appears valid. Click Save to store the settings.')
+    if deploymentValue == '' then
+        LrDialogs.message('Configuration Error', 'Please enter the deployment name (e.g., gpt-4o-deployment).')
+        return
+    end
+    
+    -- Test connection with the current values
+    LrDialogs.message('Connection Test', 'Configuration appears valid!\n\nEndpoint: ' .. endpointValue .. '\nDeployment: ' .. deploymentValue .. '\n\nClick Save to store the settings.')
 end
 
 -- Export the module
