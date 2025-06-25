@@ -13,103 +13,158 @@ local LrPathUtils = import 'LrPathUtils'
 local TroubleShoot = {}
 
 function TroubleShoot.showTroubleshootingDialog()
-    local diagnostics = TroubleShoot.runDiagnostics()
+    -- Wrap in error handling to ensure dialog always shows
+    local success, error = pcall(function()
+        local diagnostics = TroubleShoot.runDiagnostics()
+        
+        local message = "Missing Opsin Plugin Diagnostics\n" ..
+                       "=============================\n\n" ..
+                       diagnostics
+        
+        LrDialogs.message("Missing Opsin Troubleshooting", message, "info")
+    end)
     
-    local message = "Missing Opsin Plugin Diagnostics\n" ..
-                   "=============================\n\n" ..
-                   diagnostics
-    
-    LrDialogs.message("Missing Opsin Troubleshooting", message, "info")
+    -- If there was an error in the main diagnostics, show a fallback error dialog
+    if not success then
+        local fallbackMessage = "Missing Opsin Plugin Diagnostics\n" ..
+                               "=============================\n\n" ..
+                               "ERROR: Failed to run complete diagnostics: " .. tostring(error) .. "\n\n" ..
+                               "Basic Information:\n" ..
+                               "- Plugin appears to be loaded (menu item accessible)\n" ..
+                               "- Error occurred during diagnostics execution\n" ..
+                               "- This may indicate missing files or dependency issues\n\n" ..
+                               "Recommended Actions:\n" ..
+                               "1. Restart Lightroom Classic\n" ..
+                               "2. Reinstall the plugin\n" ..
+                               "3. Check that all plugin files are present\n" ..
+                               "4. Verify Lightroom Classic version is 14.4 or later"
+        
+        LrDialogs.message("Missing Opsin Troubleshooting", fallbackMessage, "warning")
+    end
 end
 
 function TroubleShoot.runDiagnostics()
     local results = {}
     
-    -- Check Lightroom version
-    local app = LrApplication
-    local versionString = app.versionString() or "Unknown"
-    local versionInfo = "Lightroom Version: " .. versionString
-    table.insert(results, versionInfo)
-    
-    -- Extract version number for compatibility check
-    local versionNumber = versionString:match("(%d+%.%d+)")
-    if versionNumber then
-        local majorVersion = tonumber(versionNumber:match("(%d+)%."))
-        local minorVersion = tonumber(versionNumber:match("%.(%d+)"))
-        
-        -- Check compatibility (14.4 or later)
-        local isCompatible = (majorVersion > 14) or (majorVersion == 14 and minorVersion >= 4)
-        local compatStatus = isCompatible and "✓ Compatible" or "✗ Requires 14.4+"
-        table.insert(results, "Compatibility: " .. compatStatus)
-    else
-        table.insert(results, "Compatibility: ⚠ Could not determine version")
+    -- Wrap each diagnostic section in error handling
+    local function safeDiagnostic(name, diagnosticFunc)
+        local success, result = pcall(diagnosticFunc)
+        if success then
+            return result
+        else
+            return "ERROR in " .. name .. ": " .. tostring(result)
+        end
     end
     
+    -- Check Lightroom version
+    local versionInfo = safeDiagnostic("version check", function()
+        local app = LrApplication
+        local versionString = app.versionString() or "Unknown"
+        local info = "Lightroom Version: " .. versionString
+        
+        -- Extract version number for compatibility check
+        local versionNumber = versionString:match("(%d+%.%d+)")
+        if versionNumber then
+            local majorVersion = tonumber(versionNumber:match("(%d+)%."))
+            local minorVersion = tonumber(versionNumber:match("%.(%d+)"))
+            
+            -- Check compatibility (14.4 or later)
+            local isCompatible = (majorVersion > 14) or (majorVersion == 14 and minorVersion >= 4)
+            local compatStatus = isCompatible and "✓ Compatible" or "✗ Requires 14.4+"
+            info = info .. "\nCompatibility: " .. compatStatus
+        else
+            info = info .. "\nCompatibility: ⚠ Could not determine version"
+        end
+        
+        return info
+    end)
+    table.insert(results, versionInfo)
+    
     -- Check OS information
-    local osInfo = "Operating System: " .. LrSystemInfo.summaryString()
+    local osInfo = safeDiagnostic("OS info check", function()
+        return "Operating System: " .. LrSystemInfo.summaryString()
+    end)
     table.insert(results, osInfo)
     
     -- Check plugin installation
-    local pluginPath = _PLUGIN.path
-    local pluginInfo = "Plugin Path: " .. (pluginPath or "Unknown")
+    local pluginInfo = safeDiagnostic("plugin path check", function()
+        local pluginPath = _PLUGIN.path
+        return "Plugin Path: " .. (pluginPath or "Unknown")
+    end)
     table.insert(results, pluginInfo)
     
     -- Check required files
-    local requiredFiles = {
-        "Info.lua",
-        "ColorAnalysis.lua", 
-        "AzureOpenAI.lua",
-        "ColorAdjustments.lua",
-        "ConfigDialog.lua",
-        "ExportDialog.lua"
-    }
-    
-    table.insert(results, "\nRequired Files Check:")
-    for _, file in ipairs(requiredFiles) do
-        local filePath = LrPathUtils.child(pluginPath, file)
-        local exists = LrFileUtils.exists(filePath)
-        local status = exists and "✓ OK" or "✗ MISSING"
-        table.insert(results, "  " .. file .. ": " .. status)
-    end
+    local fileCheckInfo = safeDiagnostic("file check", function()
+        local pluginPath = _PLUGIN.path
+        local requiredFiles = {
+            "Info.lua",
+            "ColorAnalysis.lua", 
+            "AzureOpenAI.lua",
+            "ColorAdjustments.lua",
+            "ConfigDialog.lua",
+            "ExportDialog.lua"
+        }
+        
+        local fileResults = {"\nRequired Files Check:"}
+        for _, file in ipairs(requiredFiles) do
+            local filePath = LrPathUtils.child(pluginPath, file)
+            local exists = LrFileUtils.exists(filePath)
+            local status = exists and "✓ OK" or "✗ MISSING"
+            table.insert(fileResults, "  " .. file .. ": " .. status)
+        end
+        return table.concat(fileResults, "\n")
+    end)
+    table.insert(results, fileCheckInfo)
     
     -- Check module loading
-    table.insert(results, "\nModule Loading Check:")
-    local modules = {
-        {name = "AzureOpenAI", file = "AzureOpenAI"},
-        {name = "ColorAnalysis", file = "ColorAnalysis"},
-        {name = "ColorAdjustments", file = "ColorAdjustments"},
-        {name = "ConfigDialog", file = "ConfigDialog"},
-        {name = "ExportDialog", file = "ExportDialog"}
-    }
-    
-    local moduleErrors = {}
-    for _, module in ipairs(modules) do
-        local success, result = pcall(require, module.file)
-        if success then
-            table.insert(results, "  " .. module.name .. ": ✓ OK")
-        else
-            local errorMsg = tostring(result)
-            table.insert(results, "  " .. module.name .. ": ✗ ERROR")
-            table.insert(moduleErrors, module.name .. ": " .. errorMsg)
+    local moduleCheckInfo = safeDiagnostic("module loading check", function()
+        local modules = {
+            {name = "AzureOpenAI", file = "AzureOpenAI"},
+            {name = "ColorAnalysis", file = "ColorAnalysis"},
+            {name = "ColorAdjustments", file = "ColorAdjustments"},
+            {name = "ConfigDialog", file = "ConfigDialog"},
+            {name = "ExportDialog", file = "ExportDialog"}
+        }
+        
+        local moduleResults = {"\nModule Loading Check:"}
+        local moduleErrors = {}
+        
+        for _, module in ipairs(modules) do
+            local success, result = pcall(require, module.file)
+            if success then
+                table.insert(moduleResults, "  " .. module.name .. ": ✓ OK")
+            else
+                local errorMsg = tostring(result)
+                table.insert(moduleResults, "  " .. module.name .. ": ✗ ERROR")
+                table.insert(moduleErrors, module.name .. ": " .. errorMsg)
+            end
         end
-    end
-    
-    -- Report detailed module errors if any
-    if #moduleErrors > 0 then
-        table.insert(results, "\nModule Error Details:")
-        for _, error in ipairs(moduleErrors) do
-            table.insert(results, "  " .. error)
+        
+        -- Report detailed module errors if any
+        if #moduleErrors > 0 then
+            table.insert(moduleResults, "\nModule Error Details:")
+            for _, error in ipairs(moduleErrors) do
+                table.insert(moduleResults, "  " .. error)
+            end
         end
-    end
+        
+        return table.concat(moduleResults, "\n")
+    end)
+    table.insert(results, moduleCheckInfo)
     
     -- Check configuration
-    table.insert(results, "\nConfiguration Check:")
-    local prefs = LrPrefs.prefsForPlugin()
-    local hasEndpoint = prefs.azureEndpoint and prefs.azureEndpoint ~= ""
-    local hasApiKey = prefs.azureApiKey and prefs.azureApiKey ~= ""
-    
-    table.insert(results, "  Azure Endpoint: " .. (hasEndpoint and "✓ Configured" or "✗ Not configured"))
-    table.insert(results, "  Azure API Key: " .. (hasApiKey and "✓ Configured" or "✗ Not configured"))
+    local configInfo = safeDiagnostic("configuration check", function()
+        local prefs = LrPrefs.prefsForPlugin()
+        local hasEndpoint = prefs.azureEndpoint and prefs.azureEndpoint ~= ""
+        local hasApiKey = prefs.azureApiKey and prefs.azureApiKey ~= ""
+        
+        local configResults = {"\nConfiguration Check:"}
+        table.insert(configResults, "  Azure Endpoint: " .. (hasEndpoint and "✓ Configured" or "✗ Not configured"))
+        table.insert(configResults, "  Azure API Key: " .. (hasApiKey and "✓ Configured" or "✗ Not configured"))
+        
+        return table.concat(configResults, "\n")
+    end)
+    table.insert(results, configInfo)
     
     -- SDK Version check
     table.insert(results, "\nSDK Information:")

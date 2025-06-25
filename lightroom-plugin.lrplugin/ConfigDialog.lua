@@ -24,19 +24,22 @@ end
 local ConfigDialog = {}
 
 function ConfigDialog.showConfigDialog()
-    LrFunctionContext.callWithContext('configDialog', function(context)
-        local f = LrView.osFactory()
-        local bind = LrView.bind
-        local share = LrView.share
-        
-        local props = LrBinding.makePropertyTable(context)
-        
-        -- Load current configuration with error handling
-        local AzureOpenAI = getAzureOpenAI(true)  -- Silent mode for config dialog
-        local config = {}
-        if AzureOpenAI then
-            config = AzureOpenAI.getConfig()
-        end
+    -- Wrap the entire function in error handling to ensure dialog always shows
+    local success, error = pcall(function()
+        LrFunctionContext.callWithContext('configDialog', function(context)
+            local f = LrView.osFactory()
+            local bind = LrView.bind
+            local share = LrView.share
+            local LrColor = import('LrColor')
+            
+            local props = LrBinding.makePropertyTable(context)
+            
+            -- Load current configuration with error handling
+            local AzureOpenAI = getAzureOpenAI(true)  -- Silent mode for config dialog
+            local config = {}
+            if AzureOpenAI then
+                config = AzureOpenAI.getConfig()
+            end
         
         props.azureEndpoint = config.endpoint or ''
         props.azureApiKey = config.apiKey or ''
@@ -135,7 +138,7 @@ function ConfigDialog.showConfigDialog()
                 
                 f:static_text {
                     title = 'Configure your Azure OpenAI service endpoint and API key',
-                    text_color = import('LrColor')(0.6, 0.6, 0.6),
+                    text_color = LrColor(0.6, 0.6, 0.6),
                 },
             },
         }
@@ -146,10 +149,21 @@ function ConfigDialog.showConfigDialog()
             actionVerb = 'Save',
         })
         
-        if result == 'ok' then
-            ConfigDialog.saveConfiguration(props)
-        end
+            if result == 'ok' then
+                ConfigDialog.saveConfiguration(props)
+            end
+        end)
     end)
+    
+    -- If there was an error in the main dialog creation, show a fallback error dialog
+    if not success then
+        LrDialogs.message('Missing Opsin Configuration Error', 
+            'Failed to load configuration dialog: ' .. tostring(error) .. 
+            '\n\nThis may indicate a problem with the plugin installation. Please try:' ..
+            '\n1. Restarting Lightroom Classic' ..
+            '\n2. Reinstalling the plugin' ..
+            '\n3. Checking that all plugin files are present', 'critical')
+    end
 end
 
 function ConfigDialog.saveConfiguration(props)
