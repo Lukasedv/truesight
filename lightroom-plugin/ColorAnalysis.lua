@@ -12,8 +12,24 @@ local LrPathUtils = import 'LrPathUtils'
 local LrFileUtils = import 'LrFileUtils'
 local LrProgressScope = import 'LrProgressScope'
 
-local AzureOpenAI = require 'AzureOpenAI'
-local ColorAdjustments = require 'ColorAdjustments'
+-- Lazy loading of dependencies to prevent plugin loading failures
+local function getAzureOpenAI()
+    local success, module = pcall(require, 'AzureOpenAI')
+    if not success then
+        LrDialogs.message('TrueSight Error', 'Azure OpenAI module failed to load. Please check your configuration.')
+        return nil
+    end
+    return module
+end
+
+local function getColorAdjustments()
+    local success, module = pcall(require, 'ColorAdjustments')
+    if not success then
+        LrDialogs.message('TrueSight Error', 'Color Adjustments module failed to load.')
+        return nil
+    end
+    return module
+end
 
 local ColorAnalysis = {}
 
@@ -55,6 +71,12 @@ end
 -- Analyze a single photo
 function ColorAnalysis.analyzeSinglePhoto(photo, context)
     LrTasks.startAsyncTask(function()
+        -- Get Azure OpenAI module with error handling
+        local AzureOpenAI = getAzureOpenAI()
+        if not AzureOpenAI then
+            return
+        end
+        
         -- Export photo temporarily for analysis
         local tempPath = ColorAnalysis.exportPhotoForAnalysis(photo)
         
@@ -120,7 +142,10 @@ function ColorAnalysis.showAnalysisResults(photo, analysis)
     })
     
     if result == 'ok' and analysis.adjustments then
-        ColorAdjustments.applyAdjustments(photo, analysis.adjustments)
+        local ColorAdjustments = getColorAdjustments()
+        if ColorAdjustments then
+            ColorAdjustments.applyAdjustments(photo, analysis.adjustments)
+        end
     end
 end
 

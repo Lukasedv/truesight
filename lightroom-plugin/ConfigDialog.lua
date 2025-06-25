@@ -9,7 +9,17 @@ local LrBinding = import 'LrBinding'
 local LrDialogs = import 'LrDialogs'
 local LrPrefs = import 'LrPrefs'
 
-local AzureOpenAI = require 'AzureOpenAI'
+-- Lazy loading of Azure OpenAI to prevent plugin loading failures
+local function getAzureOpenAI(silent)
+    local success, module = pcall(require, 'AzureOpenAI')
+    if not success then
+        if not silent then
+            LrDialogs.message('TrueSight Error', 'Azure OpenAI module failed to load. Please check your installation.')
+        end
+        return nil
+    end
+    return module
+end
 
 local ConfigDialog = {}
 
@@ -21,8 +31,13 @@ function ConfigDialog.showConfigDialog()
         
         local props = LrBinding.makePropertyTable(context)
         
-        -- Load current configuration
-        local config = AzureOpenAI.getConfig()
+        -- Load current configuration with error handling
+        local AzureOpenAI = getAzureOpenAI(true)  -- Silent mode for config dialog
+        local config = {}
+        if AzureOpenAI then
+            config = AzureOpenAI.getConfig()
+        end
+        
         props.azureEndpoint = config.endpoint or ''
         props.azureApiKey = config.apiKey or ''
         props.azureModel = config.model or 'gpt-4o'
@@ -138,14 +153,26 @@ function ConfigDialog.showConfigDialog()
 end
 
 function ConfigDialog.saveConfiguration(props)
-    local config = {
-        endpoint = props.azureEndpoint,
-        apiKey = props.azureApiKey,
-        model = props.azureModel,
-        deploymentName = props.azureDeploymentName,
-    }
+    local AzureOpenAI = getAzureOpenAI(true)  -- Silent mode
     
-    AzureOpenAI.setConfig(config)
+    if AzureOpenAI then
+        -- Use AzureOpenAI module to save config
+        local config = {
+            endpoint = props.azureEndpoint,
+            apiKey = props.azureApiKey,
+            model = props.azureModel,
+            deploymentName = props.azureDeploymentName,
+        }
+        AzureOpenAI.setConfig(config)
+    else
+        -- Fallback: save directly to preferences
+        local prefs = LrPrefs.prefsForPlugin()
+        prefs.azureEndpoint = props.azureEndpoint
+        prefs.azureApiKey = props.azureApiKey
+        prefs.azureModel = props.azureModel
+        prefs.azureDeploymentName = props.azureDeploymentName
+    end
+    
     LrDialogs.message('TrueSight', 'Configuration saved successfully.')
 end
 

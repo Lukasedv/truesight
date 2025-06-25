@@ -9,7 +9,15 @@ local LrBinding = import 'LrBinding'
 local LrDialogs = import 'LrDialogs'
 local LrApplication = import 'LrApplication'
 
-local ColorAnalysis = require 'ColorAnalysis'
+-- Lazy loading to prevent plugin loading failures
+local function getColorAnalysis()
+    local success, module = pcall(require, 'ColorAnalysis')
+    if not success then
+        LrDialogs.message('TrueSight Error', 'Color Analysis module failed to load.')
+        return nil
+    end
+    return module
+end
 
 local ExportDialog = {}
 
@@ -101,9 +109,14 @@ function ExportDialog.processExport(props)
     end
     
     if props.analyzeBeforeExport then
-        -- Analyze photos first
-        for _, photo in ipairs(selectedPhotos) do
-            ColorAnalysis.analyzeSinglePhoto(photo)
+        local ColorAnalysis = getColorAnalysis()
+        if ColorAnalysis then
+            -- Analyze photos first
+            for _, photo in ipairs(selectedPhotos) do
+                ColorAnalysis.analyzeSinglePhoto(photo)
+            end
+        else
+            LrDialogs.message('TrueSight Export', 'Color analysis is not available. Proceeding with standard export.')
         end
     end
     
