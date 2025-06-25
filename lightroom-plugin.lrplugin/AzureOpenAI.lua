@@ -24,18 +24,18 @@ local TIMEOUT = 30
 function AzureOpenAI.getConfig()
     local prefs = LrPrefs.prefsForPlugin()
     return {
-        endpoint = prefs.azureEndpoint,
-        apiKey = prefs.azureApiKey,
-        deploymentName = prefs.azureDeploymentName,
+        endpoint = prefs.azureEndpoint or '',
+        apiKey = prefs.azureApiKey or '',
+        deploymentName = prefs.azureDeploymentName or '',
     }
 end
 
 -- Set configuration
 function AzureOpenAI.setConfig(config)
     local prefs = LrPrefs.prefsForPlugin()
-    prefs.azureEndpoint = config.endpoint
-    prefs.azureApiKey = config.apiKey
-    prefs.azureDeploymentName = config.deploymentName
+    prefs.azureEndpoint = config.endpoint or ''
+    prefs.azureApiKey = config.apiKey or ''
+    prefs.azureDeploymentName = config.deploymentName or ''
 end
 
 -- Analyze image with Azure OpenAI

@@ -35,6 +35,7 @@ function ConfigDialog.showConfigDialog()
             local props = LrBinding.makePropertyTable(context)
             
             -- Load current configuration with error handling
+            local prefs = LrPrefs.prefsForPlugin()
             local AzureOpenAI = getAzureOpenAI(true)  -- Silent mode for config dialog
             local config = {}
             if AzureOpenAI then
@@ -42,15 +43,29 @@ function ConfigDialog.showConfigDialog()
             end
         
             -- Initialize properties with defaults, ensuring they're never nil
-            props.azureEndpoint = config.endpoint or ''
-            props.azureApiKey = config.apiKey or ''
-            props.azureDeploymentName = config.deploymentName or ''
+            -- Use preferences directly as the primary source
+            props.azureEndpoint = prefs.azureEndpoint or config.endpoint or ''
+            props.azureApiKey = prefs.azureApiKey or config.apiKey or ''
+            props.azureDeploymentName = prefs.azureDeploymentName or config.deploymentName or ''
             
-            -- Debug: Load preferences directly as fallback
-            local prefs = LrPrefs.prefsForPlugin()
-            if props.azureEndpoint == '' then props.azureEndpoint = prefs.azureEndpoint or '' end
-            if props.azureApiKey == '' then props.azureApiKey = prefs.azureApiKey or '' end
-            if props.azureDeploymentName == '' then props.azureDeploymentName = prefs.azureDeploymentName or '' end
+            -- Debug: Log what we loaded
+            local loadedMsg = 'Config loaded:\n' ..
+                            'Endpoint: "' .. tostring(props.azureEndpoint) .. '"\n' ..
+                            'API Key length: ' .. string.len(tostring(props.azureApiKey)) .. '\n' ..
+                            'Deployment: "' .. tostring(props.azureDeploymentName) .. '"'
+            
+            -- Add property observers to ensure binding is working
+            props:addObserver('azureEndpoint', function()
+                -- Optional: add debug logging here if needed
+            end)
+            
+            props:addObserver('azureApiKey', function()
+                -- Optional: add debug logging here if needed  
+            end)
+            
+            props:addObserver('azureDeploymentName', function()
+                -- Optional: add debug logging here if needed
+            end)
         
         local contents = f:column {
             spacing = f:control_spacing(),
@@ -133,7 +148,10 @@ function ConfigDialog.showConfigDialog()
                 f:push_button {
                     title = 'Test Connection',
                     action = function()
-                        ConfigDialog.testConnection(props)
+                        -- Use a task to ensure UI is fully updated
+                        LrTasks.startAsyncTask(function()
+                            ConfigDialog.testConnection(props)
+                        end)
                     end,
                 },
                 
@@ -172,33 +190,7 @@ function ConfigDialog.showConfigDialog()
 end
 
 function ConfigDialog.saveConfiguration(props)
-    -- Save directly to preferences - this is more reliable
-    local prefs = LrPrefs.prefsForPlugin()
-    prefs.azureEndpoint = props.azureEndpoint or ''
-    prefs.azureApiKey = props.azureApiKey or ''
-    prefs.azureDeploymentName = props.azureDeploymentName or ''
-    
-    -- Also try to save via AzureOpenAI module if available
-    local AzureOpenAI = getAzureOpenAI(true)  -- Silent mode
-    if AzureOpenAI then
-        local config = {
-            endpoint = props.azureEndpoint,
-            apiKey = props.azureApiKey,
-            deploymentName = props.azureDeploymentName,
-        }
-        AzureOpenAI.setConfig(config)
-    end
-    
-    -- Verify the save worked
-    local savedEndpoint = prefs.azureEndpoint or 'NOT SAVED'
-    local savedDeployment = prefs.azureDeploymentName or 'NOT SAVED'
-    
-    LrDialogs.message('Missing Opsin', 'Configuration saved successfully!\n\nEndpoint: ' .. savedEndpoint .. '\nDeployment: ' .. savedDeployment)
-end
-
-function ConfigDialog.testConnection(props)
-    -- Force update the properties from the UI fields
-    -- This is a workaround for potential binding issues
+    -- Ensure we have valid values
     local endpointValue = tostring(props.azureEndpoint or '')
     local apiKeyValue = tostring(props.azureApiKey or '')
     local deploymentValue = tostring(props.azureDeploymentName or '')
@@ -208,12 +200,53 @@ function ConfigDialog.testConnection(props)
     apiKeyValue = string.gsub(apiKeyValue, "^%s*(.-)%s*$", "%1")
     deploymentValue = string.gsub(deploymentValue, "^%s*(.-)%s*$", "%1")
     
-    -- Debug output
+    -- Save directly to preferences - this is more reliable
+    local prefs = LrPrefs.prefsForPlugin()
+    prefs.azureEndpoint = endpointValue
+    prefs.azureApiKey = apiKeyValue
+    prefs.azureDeploymentName = deploymentValue
+    
+    -- Also try to save via AzureOpenAI module if available
+    local AzureOpenAI = getAzureOpenAI(true)  -- Silent mode
+    if AzureOpenAI then
+        local config = {
+            endpoint = endpointValue,
+            apiKey = apiKeyValue,
+            deploymentName = deploymentValue,
+        }
+        AzureOpenAI.setConfig(config)
+    end
+    
+    -- Verify the save worked by re-reading
+    local savedEndpoint = prefs.azureEndpoint or 'NOT SAVED'
+    local savedDeployment = prefs.azureDeploymentName or 'NOT SAVED'
+    local savedApiKeyLength = string.len(prefs.azureApiKey or '')
+    
+    LrDialogs.message('Missing Opsin', 'Configuration saved successfully!\n\nEndpoint: ' .. savedEndpoint .. '\nDeployment: ' .. savedDeployment .. '\nAPI Key Length: ' .. savedApiKeyLength)
+end
+
+function ConfigDialog.testConnection(props)
+    -- Add a small delay to ensure UI values are synchronized
+    LrTasks.sleep(0.1)
+    
+    -- Force refresh properties from the dialog state
+    local endpointValue = tostring(props.azureEndpoint or '')
+    local apiKeyValue = tostring(props.azureApiKey or '')
+    local deploymentValue = tostring(props.azureDeploymentName or '')
+    
+    -- Trim whitespace
+    endpointValue = string.gsub(endpointValue, "^%s*(.-)%s*$", "%1")
+    apiKeyValue = string.gsub(apiKeyValue, "^%s*(.-)%s*$", "%1")
+    deploymentValue = string.gsub(deploymentValue, "^%s*(.-)%s*$", "%1")
+    
+    -- Debug output (more detailed)
     local debugMsg = 'Debug Info:\n' ..
                     'Endpoint length: ' .. string.len(endpointValue) .. '\n' ..
                     'Endpoint value: "' .. endpointValue .. '"\n' ..
                     'API Key length: ' .. string.len(apiKeyValue) .. '\n' ..
-                    'Deployment: "' .. deploymentValue .. '"'
+                    'Deployment: "' .. deploymentValue .. '"\n' ..
+                    'Props type: ' .. type(props) .. '\n' ..
+                    'Raw endpoint: ' .. tostring(props.azureEndpoint)
     
     -- Basic validation with detailed error messages
     if endpointValue == '' then
