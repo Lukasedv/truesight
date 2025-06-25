@@ -7,7 +7,7 @@
             "metadata": {
                 "description": "Name of the Azure OpenAI service"
             },
-            "defaultValue": "[concat('truesight-openai-', uniqueString(resourceGroup().id))]"
+            "defaultValue": "[concat('missing-opsin-openai-', uniqueString(resourceGroup().id))]"
         },
         "location": {
             "type": "string",

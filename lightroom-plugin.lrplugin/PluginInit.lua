@@ -1,5 +1,5 @@
 --[[
-TrueSight Plugin Initialization
+Missing Opsin Plugin Initialization
 This file is called when the plugin is loaded to perform initialization checks
 ]]
 
@@ -8,12 +8,12 @@ local LrLogger = import 'LrLogger'
 local LrApplication = import 'LrApplication'
 
 -- Set up logging
-local pluginLogger = LrLogger('TrueSight')
+local pluginLogger = LrLogger('Missing Opsin')
 pluginLogger:enable("logfile")
 
 -- Initialize plugin
 local function initPlugin()
-    pluginLogger:info("TrueSight plugin initializing...")
+    pluginLogger:info("Missing Opsin plugin initializing...")
     
     -- Check Lightroom version compatibility
     local app = LrApplication
@@ -30,7 +30,7 @@ local function initPlugin()
         local isCompatible = (majorVersion > 14) or (majorVersion == 14 and minorVersion >= 4)
         
         if not isCompatible then
-            local warningMsg = "TrueSight Plugin Warning:\n\n" ..
+            local warningMsg = "Missing Opsin Plugin Warning:\n\n" ..
                              "This plugin requires Lightroom Classic 14.4 or later.\n" ..
                              "Current version: " .. version .. "\n\n" ..
                              "The plugin may not function correctly. Please update Lightroom Classic."
@@ -38,7 +38,7 @@ local function initPlugin()
             pluginLogger:warn("Version compatibility issue: " .. version)
             
             -- Show warning but don't prevent loading entirely
-            LrDialogs.message("TrueSight Compatibility Warning", warningMsg, "warning")
+            LrDialogs.message("Missing Opsin Compatibility Warning", warningMsg, "warning")
         else
             pluginLogger:info("Version compatibility: OK")
         end
@@ -70,18 +70,18 @@ local function initPlugin()
     
     -- Report any loading errors
     if #loadErrors > 0 then
-        local errorMessage = "TrueSight Plugin Loading Issues:\n\n" .. table.concat(loadErrors, "\n\n") ..
+        local errorMessage = "Missing Opsin Plugin Loading Issues:\n\n" .. table.concat(loadErrors, "\n\n") ..
                            "\n\nPlease check the plugin installation and try restarting Lightroom."
         
         -- Show error dialog only if in development mode or if requested
         local showErrors = false -- Set to true during development/debugging
         if showErrors then
-            LrDialogs.message("TrueSight Plugin Error", errorMessage, "critical")
+            LrDialogs.message("Missing Opsin Plugin Error", errorMessage, "critical")
         end
         
         pluginLogger:error("Plugin initialization completed with errors")
     else
-        pluginLogger:info("TrueSight plugin initialized successfully")
+        pluginLogger:info("Missing Opsin plugin initialized successfully")
     end
 end
 

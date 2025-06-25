@@ -1,5 +1,5 @@
 --[[
-TrueSight Troubleshooting Module
+Missing Opsin Troubleshooting Module
 Provides diagnostic tools to help troubleshoot plugin loading and configuration issues
 ]]
 
@@ -15,11 +15,11 @@ local TroubleShoot = {}
 function TroubleShoot.showTroubleshootingDialog()
     local diagnostics = TroubleShoot.runDiagnostics()
     
-    local message = "TrueSight Plugin Diagnostics\n" ..
+    local message = "Missing Opsin Plugin Diagnostics\n" ..
                    "=============================\n\n" ..
                    diagnostics
     
-    LrDialogs.message("TrueSight Troubleshooting", message, "info")
+    LrDialogs.message("Missing Opsin Troubleshooting", message, "info")
 end
 
 function TroubleShoot.runDiagnostics()

@@ -1,6 +1,6 @@
-# TrueSight Deployment Guide
+# Missing Opsin Deployment Guide
 
-This guide provides detailed instructions for deploying TrueSight in various environments.
+This guide provides detailed instructions for deploying Missing Opsin in various environments.
 
 ## Development Environment
 
@@ -15,8 +15,8 @@ This guide provides detailed instructions for deploying TrueSight in various env
 
 1. **Clone Repository**
    ```bash
-   git clone https://github.com/Lukasedv/truesight.git
-   cd truesight
+   git clone https://github.com/Lukasedv/missing-opsin.git
+   cd missing-opsin
    ```
 
 2. **Azure Login**
@@ -38,7 +38,7 @@ This guide provides detailed instructions for deploying TrueSight in various env
 
 5. **Configure Plugin**
    - Use the endpoint and API key from deployment output
-   - Help > TrueSight Help > Configuration
+   - Help > Missing Opsin Help > Configuration
 
 ## Production Environment
 
@@ -47,18 +47,18 @@ This guide provides detailed instructions for deploying TrueSight in various env
 1. **Create Service Principal**
    ```bash
    az ad sp create-for-rbac \
-     --name "truesight-prod-sp" \
+     --name "missing-opsin-prod-sp" \
      --role "Contributor" \
-     --scopes "/subscriptions/{subscription-id}/resourceGroups/truesight-prod-rg"
+     --scopes "/subscriptions/{subscription-id}/resourceGroups/missing-opsin-prod-rg"
    ```
 
 2. **Deploy with ARM Template**
    ```bash
    az deployment group create \
-     --resource-group "truesight-prod-rg" \
+     --resource-group "missing-opsin-prod-rg" \
      --template-file azure-infrastructure/deploy-openai.json \
      --parameters \
-       openAiServiceName="truesight-openai-prod" \
+       openAiServiceName="missing-opsin-openai-prod" \
        deploymentName="gpt-4o-prod" \
        deploymentCapacity=100
    ```
@@ -67,11 +67,11 @@ This guide provides detailed instructions for deploying TrueSight in various env
    ```bash
    # Enable diagnostic settings
    az monitor diagnostic-settings create \
-     --resource "/subscriptions/{sub-id}/resourceGroups/truesight-prod-rg/providers/Microsoft.CognitiveServices/accounts/truesight-openai-prod" \
-     --name "truesight-diagnostics" \
+     --resource "/subscriptions/{sub-id}/resourceGroups/missing-opsin-prod-rg/providers/Microsoft.CognitiveServices/accounts/missing-opsin-openai-prod" \
+     --name "missing-opsin-diagnostics" \
      --logs '[{"category":"RequestResponse","enabled":true}]' \
      --metrics '[{"category":"AllMetrics","enabled":true}]' \
-     --workspace "/subscriptions/{sub-id}/resourceGroups/truesight-prod-rg/providers/Microsoft.OperationalInsights/workspaces/truesight-workspace"
+     --workspace "/subscriptions/{sub-id}/resourceGroups/missing-opsin-prod-rg/providers/Microsoft.OperationalInsights/workspaces/missing-opsin-workspace"
    ```
 
 ### Plugin Distribution
@@ -79,9 +79,9 @@ This guide provides detailed instructions for deploying TrueSight in various env
 1. **Create Release Package**
    ```bash
    mkdir -p release
-   cp -r lightroom-plugin.lrplugin release/TrueSight.lrplugin
+   cp -r lightroom-plugin.lrplugin release/Missing Opsin.lrplugin
    cd release
-   zip -r TrueSight-v1.0.0.zip TrueSight.lrplugin/
+   zip -r Missing Opsin-v1.0.0.zip Missing Opsin.lrplugin/
    ```
 
 2. **Digital Signing** (Optional)
@@ -94,18 +94,18 @@ This guide provides detailed instructions for deploying TrueSight in various env
 
 ```bash
 # Development
-RESOURCE_GROUP="truesight-dev-rg"
-OPENAI_SERVICE="truesight-openai-dev"
+RESOURCE_GROUP="missing-opsin-dev-rg"
+OPENAI_SERVICE="missing-opsin-openai-dev"
 DEPLOYMENT_CAPACITY=20
 
 # Staging
-RESOURCE_GROUP="truesight-staging-rg"
-OPENAI_SERVICE="truesight-openai-staging"
+RESOURCE_GROUP="missing-opsin-staging-rg"
+OPENAI_SERVICE="missing-opsin-openai-staging"
 DEPLOYMENT_CAPACITY=50
 
 # Production
-RESOURCE_GROUP="truesight-prod-rg"
-OPENAI_SERVICE="truesight-openai-prod"
+RESOURCE_GROUP="missing-opsin-prod-rg"
+OPENAI_SERVICE="missing-opsin-openai-prod"
 DEPLOYMENT_CAPACITY=100
 ```
 
@@ -141,7 +141,7 @@ DEPLOYMENT_CAPACITY=100
    az consumption usage list \
      --start-date $(date -d "$(date +%Y-%m-01)" +%Y-%m-%d) \
      --end-date $(date +%Y-%m-%d) \
-     --query "[?contains(resourceName,'truesight')]"
+     --query "[?contains(resourceName,'missing-opsin')]"
    ```
 
 ### Backup and Recovery
@@ -150,7 +150,7 @@ DEPLOYMENT_CAPACITY=100
    ```bash
    # Export ARM template
    az group export \
-     --resource-group "truesight-prod-rg" \
+     --resource-group "missing-opsin-prod-rg" \
      --output-path "backup-$(date +%Y%m%d).json"
    ```
 
@@ -158,8 +158,8 @@ DEPLOYMENT_CAPACITY=100
    ```bash
    # Regenerate API keys
    az cognitiveservices account keys regenerate \
-     --name "truesight-openai-prod" \
-     --resource-group "truesight-prod-rg" \
+     --name "missing-opsin-openai-prod" \
+     --resource-group "missing-opsin-prod-rg" \
      --key-name "Key1"
    ```
 
@@ -169,8 +169,8 @@ DEPLOYMENT_CAPACITY=100
    ```bash
    # Scale deployment capacity
    az cognitiveservices deployment update \
-     --name "truesight-openai-prod" \
-     --resource-group "truesight-prod-rg" \
+     --name "missing-opsin-openai-prod" \
+     --resource-group "missing-opsin-prod-rg" \
      --deployment-name "gpt-4o-prod" \
      --sku-capacity 200
    ```
@@ -188,8 +188,8 @@ DEPLOYMENT_CAPACITY=100
    ```bash
    # Verify API key
    az cognitiveservices account keys list \
-     --name "truesight-openai-prod" \
-     --resource-group "truesight-prod-rg"
+     --name "missing-opsin-openai-prod" \
+     --resource-group "missing-opsin-prod-rg"
    ```
 
 2. **Quota Exceeded**
@@ -223,12 +223,12 @@ DEPLOYMENT_CAPACITY=100
    ```bash
    # Create private endpoint for OpenAI service
    az network private-endpoint create \
-     --name "truesight-openai-pe" \
-     --resource-group "truesight-prod-rg" \
-     --vnet-name "truesight-vnet" \
-     --subnet "truesight-subnet" \
-     --private-connection-resource-id "/subscriptions/{sub-id}/resourceGroups/truesight-prod-rg/providers/Microsoft.CognitiveServices/accounts/truesight-openai-prod" \
-     --connection-name "truesight-openai-connection" \
+     --name "missing-opsin-openai-pe" \
+     --resource-group "missing-opsin-prod-rg" \
+     --vnet-name "missing-opsin-vnet" \
+     --subnet "missing-opsin-subnet" \
+     --private-connection-resource-id "/subscriptions/{sub-id}/resourceGroups/missing-opsin-prod-rg/providers/Microsoft.CognitiveServices/accounts/missing-opsin-openai-prod" \
+     --connection-name "missing-opsin-openai-connection" \
      --group-ids "account"
    ```
 
@@ -236,8 +236,8 @@ DEPLOYMENT_CAPACITY=100
    ```bash
    # Configure network access rules
    az cognitiveservices account network-rule add \
-     --name "truesight-openai-prod" \
-     --resource-group "truesight-prod-rg" \
+     --name "missing-opsin-openai-prod" \
+     --resource-group "missing-opsin-prod-rg" \
      --ip-address "203.0.113.0/24"
    ```
 
@@ -261,7 +261,7 @@ DEPLOYMENT_CAPACITY=100
    ```bash
    # Enable audit logs
    az monitor diagnostic-settings create \
-     --resource "/subscriptions/{sub-id}/resourceGroups/truesight-prod-rg/providers/Microsoft.CognitiveServices/accounts/truesight-openai-prod" \
+     --resource "/subscriptions/{sub-id}/resourceGroups/missing-opsin-prod-rg/providers/Microsoft.CognitiveServices/accounts/missing-opsin-openai-prod" \
      --name "audit-logs" \
      --logs '[{"category":"Audit","enabled":true}]'
    ```
@@ -273,8 +273,8 @@ DEPLOYMENT_CAPACITY=100
 1. **Set Budget Alerts**
    ```bash
    az consumption budget create \
-     --budget-name "truesight-monthly-budget" \
-     --resource-group "truesight-prod-rg" \
+     --budget-name "missing-opsin-monthly-budget" \
+     --resource-group "missing-opsin-prod-rg" \
      --amount 500 \
      --time-grain "Monthly" \
      --notifications amount=450 contactEmails="admin@example.com"
@@ -297,4 +297,4 @@ DEPLOYMENT_CAPACITY=100
    - Use async processing
    - Implement retry logic
 
-This deployment guide provides a comprehensive approach to setting up TrueSight in various environments while maintaining security, performance, and cost efficiency.
+This deployment guide provides a comprehensive approach to setting up Missing Opsin in various environments while maintaining security, performance, and cost efficiency.
