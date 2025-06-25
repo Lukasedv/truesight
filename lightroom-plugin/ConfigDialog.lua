@@ -10,10 +10,12 @@ local LrDialogs = import 'LrDialogs'
 local LrPrefs = import 'LrPrefs'
 
 -- Lazy loading of Azure OpenAI to prevent plugin loading failures
-local function getAzureOpenAI()
+local function getAzureOpenAI(silent)
     local success, module = pcall(require, 'AzureOpenAI')
     if not success then
-        LrDialogs.message('TrueSight Error', 'Azure OpenAI module failed to load. Please check your installation.')
+        if not silent then
+            LrDialogs.message('TrueSight Error', 'Azure OpenAI module failed to load. Please check your installation.')
+        end
         return nil
     end
     return module
@@ -30,7 +32,7 @@ function ConfigDialog.showConfigDialog()
         local props = LrBinding.makePropertyTable(context)
         
         -- Load current configuration with error handling
-        local AzureOpenAI = getAzureOpenAI()
+        local AzureOpenAI = getAzureOpenAI(true)  -- Silent mode for config dialog
         local config = {}
         if AzureOpenAI then
             config = AzureOpenAI.getConfig()
@@ -151,19 +153,26 @@ function ConfigDialog.showConfigDialog()
 end
 
 function ConfigDialog.saveConfiguration(props)
-    local AzureOpenAI = getAzureOpenAI()
-    if not AzureOpenAI then
-        return
+    local AzureOpenAI = getAzureOpenAI(true)  -- Silent mode
+    
+    if AzureOpenAI then
+        -- Use AzureOpenAI module to save config
+        local config = {
+            endpoint = props.azureEndpoint,
+            apiKey = props.azureApiKey,
+            model = props.azureModel,
+            deploymentName = props.azureDeploymentName,
+        }
+        AzureOpenAI.setConfig(config)
+    else
+        -- Fallback: save directly to preferences
+        local prefs = LrPrefs.prefsForPlugin()
+        prefs.azureEndpoint = props.azureEndpoint
+        prefs.azureApiKey = props.azureApiKey
+        prefs.azureModel = props.azureModel
+        prefs.azureDeploymentName = props.azureDeploymentName
     end
     
-    local config = {
-        endpoint = props.azureEndpoint,
-        apiKey = props.azureApiKey,
-        model = props.azureModel,
-        deploymentName = props.azureDeploymentName,
-    }
-    
-    AzureOpenAI.setConfig(config)
     LrDialogs.message('TrueSight', 'Configuration saved successfully.')
 end
 
