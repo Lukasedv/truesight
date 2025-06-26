@@ -6,6 +6,8 @@
 temp/
 tmp/
 
+.SDK
+
 # Build artifacts
 dist/
 build/
